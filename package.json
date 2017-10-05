@@ -18,7 +18,10 @@
     "url": "https://github.com/Alaboudi1/Quoridor/issues"
   },
   "homepage": "https://github.com/Alaboudi1/Quoridor#readme",
-  "dependencies": {},
+  "dependencies": {
+    "firebase": "^4.4.0",
+    "pubsub-js": "^1.5.7"
+  },
   "devDependencies": {
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
