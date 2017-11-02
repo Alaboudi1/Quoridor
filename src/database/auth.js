@@ -7,38 +7,34 @@ export class auth {
     this.auth = firebase.auth();
     this.authenticationStatus();
   }
-  
-// @required subscributions:
-// 1. nameUpdate -> the name of the user.
-// 2. authErro -> the error that occurs while trying to create the user.
-   
+
+  // @required subscributions:
+  // 1. nameUpdate -> the name of the user.
+  // 2. authErro -> the error that occurs while trying to create the user.
+
   signUp(username, pass, name) {
     this.auth
       .createUserWithEmailAndPassword(username, pass)
       .then(user => {
-        this.publish("nameUpdate",name);
-        user
-          .updateProfile({ displayName: name })
-          .catch(err => this.publish("authErro", err));
+        user.updateProfile({ displayName: name });
+        return user;
       })
+      .then(user => this.publish("authChange", user))
       .catch(err => this.publish("authErro", err));
   }
-    
-// @required subscributions:
-// 1. authErro -> the error that occurs while trying to login the user.
+
+  // @required subscributions:
+  // 1. authErro -> the error that occurs while trying to login the user.
   logIn(username, pass) {
     this.auth
       .signInWithEmailAndPassword(username, pass)
-      .then(user => console.log(user))
       .catch(err => this.publish("authErro", err));
   }
-      
-// @required subscributions:
-// 1. authErro -> the error that occurs while trying to logout the user.
+
+  // @required subscributions:
+  // 1. authErro -> the error that occurs while trying to logout the user.
   logout() {
-    this.auth
-      .signOut()
-      .catch(err => this.publish("authErro", err));
+    this.auth.signOut().catch(err => this.publish("authErro", err));
   }
   authenticationStatus() {
     this.auth.onAuthStateChanged(user => this.publish("authChange", user));

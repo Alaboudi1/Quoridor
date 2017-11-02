@@ -9,7 +9,7 @@ export class db {
     this.database = firebase.database();
     this.newWaitingGameSubscribtion();
   }
-  createNewWaitingGame(gameName, userName) {
+  createNewWaitingGame(gameName, user) {
     const gameId = this.generatekey();
     this.cancelWaitingGamesSubscribtion();           
     this.database
@@ -53,6 +53,7 @@ export class db {
         .ref(`/currentGames/${game.gameId}/${playerTwoId}`)
         .set({ status, messages, playKey, playerNumber, playerName })
         .then(() => res())
+        .catch(err => rej(err))
     );
   }
   createGame(gameId, gameName, playerName) {

@@ -1,12 +1,14 @@
 // Here should go all the javascript code, you could aslo import whatever you want for example:
 import { auth } from "./database/auth";
 import { db } from "./database/db";
+import { user } from "./user";
 import PubSub from "pubsub-js";
 
 class index {
   constructor() {
     this.db = new db();
     this.auth = new auth();
+    this.user = new user();
     this.subscrube();
     this.hide(mainPage);
   }
@@ -40,13 +42,18 @@ class index {
     }
   }
   createGame(id) {
-    this.db.createNewWaitingGame(gameName.value, this.auth.auth.currentUser.displayName);
+    this.db.createNewWaitingGame(
+      gameName.value,
+      this.user
+    );
   }
   joinAgame(id) {
     this.db.joinExistingGame(id, this.auth.auth.currentUser.displayName); //need API for name
   }
   checkStatus(user) {
     if (user) {
+      this.user.setInfo(user.displayName, user.uid);
+      
       this.show(logOut);
       this.show(lableName);
       this.show(mainPage);
@@ -54,6 +61,7 @@ class index {
       this.hide(errMessage);
       if (user.displayName) this.updateUserName(user.displayName);
     } else {
+      this.user.setInfo("", "");
       this.show(form);
       this.hide(logOut);
       this.hide(lableName);
@@ -70,9 +78,7 @@ class index {
       this.mainPageRender();
     });
     PubSub.subscribe("currentGame", (meg, data) => (this.currentGame = data)); //waiting for the second player to join!
-    PubSub.subscribe("nameUpdate", (meg, name) =>
-      this.updateUserName(name)
-    );
+    PubSub.subscribe("nameUpdate", (meg, name) => this.updateUserName(name));
     PubSub.subscribe("authChange", (meg, user) => this.checkStatus(user));
     PubSub.subscribe("authErro", (msg, data) => {
       console.log(data.message);
@@ -88,7 +94,7 @@ class index {
   }
 
   updateUserName(name) {
-    lableName.textContent =`Welcome: ${name}`;
+    lableName.textContent = `Welcome: ${name}`;
   }
 }
 

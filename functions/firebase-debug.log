@@ -1,0 +1,35 @@
+[debug] [2017-11-02T18:46:01.361Z] ----------------------------------------------------------------------
+[debug] [2017-11-02T18:46:01.362Z] Command:       /usr/bin/node /home/abdulaziz/Desktop/code/Quoridor/functions/node_modules/.bin/firebase serve --only functions
+[debug] [2017-11-02T18:46:01.363Z] CLI Version:   3.14.0
+[debug] [2017-11-02T18:46:01.363Z] Platform:      linux
+[debug] [2017-11-02T18:46:01.363Z] Node Version:  v8.5.0
+[debug] [2017-11-02T18:46:01.363Z] Time:          Thu Nov 02 2017 14:46:01 GMT-0400 (EDT)
+[debug] [2017-11-02T18:46:01.363Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2017-11-02T18:46:01.373Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2017-11-02T18:46:01.373Z] > authorizing via signed-in user
+[debug] [2017-11-02T18:46:01.375Z] > refreshing access token with scopes: ["email","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","openid"]
+[debug] [2017-11-02T18:46:01.375Z] >>> HTTP REQUEST POST https://www.googleapis.com/oauth2/v3/token { refresh_token: '1/dI06q--S5vQEeuA0SP4-GVpBGRSNh6lIEO9B8KohRfo',
+  client_id: '563584335869-fgrhgmd47bqnekij5i8b5pr03ho849e6.apps.googleusercontent.com',
+  client_secret: 'j9iVZfS8kkCEFUPaAeJV0sAi',
+  grant_type: 'refresh_token',
+  scope: 'email https://www.googleapis.com/auth/cloud-platform https://www.googleapis.com/auth/cloudplatformprojects.readonly https://www.googleapis.com/auth/firebase openid' } 
+ Thu Nov 02 2017 14:46:01 GMT-0400 (EDT)
+[debug] [2017-11-02T18:46:01.469Z] <<< HTTP RESPONSE 200
+[debug] [2017-11-02T18:46:01.479Z] >>> HTTP REQUEST GET https://admin.firebase.com/v1/projects/quoridor-swe681  
+ Thu Nov 02 2017 14:46:01 GMT-0400 (EDT)
+[debug] [2017-11-02T18:46:01.837Z] <<< HTTP RESPONSE 200
+[debug] [2017-11-02T18:46:01.842Z] >>> HTTP REQUEST GET https://admin.firebase.com/v1/database/quoridor-swe681/tokens  
+ Thu Nov 02 2017 14:46:01 GMT-0400 (EDT)
+[debug] [2017-11-02T18:46:02.363Z] <<< HTTP RESPONSE 200
+[info] 
+[info] === Serving from '/home/abdulaziz/Desktop/code/Quoridor'...
+[info] 
+[info] i  functions: Preparing to emulate functions.
+[debug] [2017-11-02T18:46:02.659Z] >>> HTTP REQUEST GET https://appengine.googleapis.com/v1/apps/quoridor-swe681  
+ Thu Nov 02 2017 14:46:02 GMT-0400 (EDT)
+[debug] [2017-11-02T18:46:02.660Z] >>> HTTP REQUEST GET https://apikeys.googleapis.com/v1/projects/quoridor-swe681/apiKeys  
+ Thu Nov 02 2017 14:46:02 GMT-0400 (EDT)
+[debug] [2017-11-02T18:46:02.916Z] <<< HTTP RESPONSE 200
+[debug] [2017-11-02T18:46:02.934Z] <<< HTTP RESPONSE 200
+[info] ✔  functions: api: http://localhost:5000/quoridor-swe681/us-central1/api
