@@ -41,11 +41,10 @@ class index {
         throw new Error("UnsupportedOperation:manageAuth");
     }
   }
-  createGame(id) {
-    this.db.createNewWaitingGame(
-      gameName.value,
-      this.user
-    );
+  createGame() {
+    this.auth.getIdToken().then(idToken => {
+      this.db.createNewWaitingGame(gameName.value, idToken);
+    });
   }
   joinAgame(id) {
     this.db.joinExistingGame(id, this.auth.auth.currentUser.displayName); //need API for name
@@ -53,7 +52,7 @@ class index {
   checkStatus(user) {
     if (user) {
       this.user.setInfo(user.displayName, user.uid);
-      
+
       this.show(logOut);
       this.show(lableName);
       this.show(mainPage);
@@ -80,7 +79,7 @@ class index {
     PubSub.subscribe("currentGame", (meg, data) => (this.currentGame = data)); //waiting for the second player to join!
     PubSub.subscribe("nameUpdate", (meg, name) => this.updateUserName(name));
     PubSub.subscribe("authChange", (meg, user) => this.checkStatus(user));
-    PubSub.subscribe("authErro", (msg, data) => {
+    PubSub.subscribe("error", (msg, data) => {
       console.log(data.message);
       this.show(errMessage);
       errMessage.textContent = data.message;

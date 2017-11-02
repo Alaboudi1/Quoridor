@@ -10,7 +10,7 @@ export class auth {
 
   // @required subscributions:
   // 1. nameUpdate -> the name of the user.
-  // 2. authErro -> the error that occurs while trying to create the user.
+  // 2. error -> the error that occurs while trying to create the user.
 
   signUp(username, pass, name) {
     this.auth
@@ -20,24 +20,34 @@ export class auth {
         return user;
       })
       .then(user => this.publish("authChange", user))
-      .catch(err => this.publish("authErro", err));
+      .catch(err => this.publish("error", err));
+  }
+  getIdToken() {
+    return new Promise((res, rej) => {
+      this.auth.currentUser
+        .getToken(true)
+        .then(idToken => res(idToken))
+        .catch(err => rej(err));
+    });
   }
 
   // @required subscributions:
-  // 1. authErro -> the error that occurs while trying to login the user.
+  // 1. error -> the error that occurs while trying to login the user.
   logIn(username, pass) {
     this.auth
       .signInWithEmailAndPassword(username, pass)
-      .catch(err => this.publish("authErro", err));
+      .catch(err => this.publish("error", err));
   }
 
   // @required subscributions:
-  // 1. authErro -> the error that occurs while trying to logout the user.
+  // 1. error -> the error that occurs while trying to logout the user.
   logout() {
-    this.auth.signOut().catch(err => this.publish("authErro", err));
+    this.auth.signOut().catch(err => this.publish("error", err));
   }
   authenticationStatus() {
-    this.auth.onAuthStateChanged(user => this.publish("authChange", user));
+    this.auth.onAuthStateChanged(user => {
+      this.publish("authChange", user);
+    });
   }
   publish(message, data) {
     PubSub.publish(message, data);

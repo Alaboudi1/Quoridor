@@ -1,8 +1,7 @@
 const functions = require("firebase-functions");
-const admin = require("firebase-admin");
 const express = require("express");
-
-admin.initializeApp(functions.config().firebase);
+const { isAuthenticated, isVaildMove } = require("./verifier");
+const { setGameState, createGame, joinGame } = require("./game");
 
 // Create and Deploy Your First Cloud Functions
 // https://firebase.google.com/docs/functions/write-firebase-functions
@@ -10,43 +9,29 @@ const app = express();
 
 app.put("/setMove", (req, res) => {
   const params = req.body;
-  if(params.message){
-  params.message = params.message +" Abdulaziz";
-  res.set("Content-Type", "application/json");
-  res.send(params);
-  }
-  else
-  res.send(400);
-
+    isAuthenticated(params.token)
+      .then(userId => isVaildMove(params.gameState, userId))
+      .then(gameSate => setGameState(gameSate))
+      .catch(err => res.send(err));
 });
 
 app.post("/createGame", (req, res) => {
   const params = req.body;
-  if(params.message){
-  params.message = params.message +" Abdulaziz";
-  res.set("Content-Type", "application/json");
-  res.send(params);
-  }
-  else
-  res.send(400);
-
+  isAuthenticated(params.token)
+    .then(userId => createGame(params.gameName, userId))
+    .then(gameId => res.send(gameId))
+    .catch(err => res.send(err));
 });
 
 app.put("/joinGame", (req, res) => {
   const params = req.body;
-  if(params.message){
-  params.message = params.message +" Abdulaziz";
-  res.set("Content-Type", "application/json");
-  res.send(params);
-  }
-  else
-  res.send(400);
-
+  isAuthenticated(params.token)
+  .then(userId => joinGame(params.gameId, userId))
+  .then(gameId => res.send(gameId))
+  .catch(err => res.send(err));
 });
 app.all("**", (req, res) => {
-  
-  res.send(404);
-
+  res.sendStatus(404);
 });
 
 exports.api = functions.https.onRequest(app);

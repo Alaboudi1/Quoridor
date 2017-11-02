@@ -9,13 +9,16 @@ export class db {
     this.database = firebase.database();
     this.newWaitingGameSubscribtion();
   }
-  createNewWaitingGame(gameName, user) {
-    const gameId = this.generatekey();
-    this.cancelWaitingGamesSubscribtion();           
-    this.database
-      .ref(`/waitingGames/${gameId}`)
-      .set({ gameId, gameName })
-      .then(() => this.createGame(gameId, gameName, userName));
+  createNewWaitingGame(gameName, idToken) {
+    this.cancelWaitingGamesSubscribtion();
+    fetch("https://us-central1-quoridor-swe681.cloudfunctions.net/api", {
+      method: "POST",
+      token: idToken,
+      body: {
+        gameName
+      }
+    }).then(gameId => this.publish("currentGame", { gameName, gameId }))
+    .catch(err => this.publish("error", err));
   }
   //@scope: private
   generatekey() {
@@ -47,7 +50,7 @@ export class db {
     const messages = {};
     const playKey = "none";
     const playerNumber = "playerTwo";
-    this.  cancelWaitingGamesSubscribtion();      
+    this.cancelWaitingGamesSubscribtion();
     return new Promise((res, rej) =>
       this.database
         .ref(`/currentGames/${game.gameId}/${playerTwoId}`)
@@ -56,17 +59,7 @@ export class db {
         .catch(err => rej(err))
     );
   }
-  createGame(gameId, gameName, playerName) {
-    const playerOneId = this.generatekey();
-    const status = {};
-    const messages = {};
-    const playKey = "none";
-    const playerNumber = "playerOne";
-    this.database
-      .ref(`/currentGames/${gameId}/${playerOneId}`)
-      .set({ status, messages, playKey, playerNumber, playerName })
-      .then(() => this.publish("currentGame", { gameId, gameName }));
-  }
+
   //@scope: private
   findThisGame(gameId) {
     return new Promise((res, rej) =>
@@ -80,7 +73,7 @@ export class db {
   //TODO
   RigisterOneMove() {}
   ReceiveOneMove() {}
-  RevokOneMove(reason) {}
+
 
   //@scope:private
   newWaitingGameSubscribtion() {
@@ -95,6 +88,4 @@ export class db {
   publish(message, data) {
     PubSub.publish(message, data);
   }
-  //TODO:
-  //1. add shared section in the database, so players can securely pass messages between each other.
 }
