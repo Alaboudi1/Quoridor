@@ -1,21 +1,39 @@
-
-const createGame = () =>{
-    // this.database
-    // .ref(`/waitingGames/${gameId}`)
-    // .set({ gameId, gameName })
-    // .then(() => this.createGame(gameId, gameName, userName));
-    // createGame(gameId, gameName, playerName) {
-    //     const playerOneId = this.generatekey();
-    //     const status = {};
-    //     const messages = {};
-    //     const playKey = "none";
-    //     const playerNumber = "playerOne";
-    //     this.database
-    //       .ref(`/currentGames/${gameId}/${playerOneId}`)
-    //       .set({ status, messages, playKey, playerNumber, playerName })
-    //       .then(() => this.publish("currentGame", { gameId, gameName }));
-    //   }
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
+admin.initializeApp(functions.config().firebase);
+const createGame = () => {
+  new Promise.all(createPriviteGame, createWaitingGame);
+};
+const joinGame = (gameId, userId) => {
+  new Promise.all(addPlayerToGame(gameId, userId), deleteWaitingGame(gameId));
+};
+const addPlayerToGame = (gameId, userId) => {};
+const deleteWaitingGame = gameId => {};
+const createPriviteGame = () => {};
+const createWaitingGame = () => {};
+const getInitialState = () => ({
+  playerOne: { position: null, reminingPawns: 6 },
+  playerTwo: { position: null, reminingPawns: 6 },
+  PawnsPositions: [],
+  Winner: null
+});
+const setGameState = (gameState, gameId) =>
+  new Promise((res, rej) =>
+    admin
+      .database()
+      .ref($`/games/${gameId}/public`)
+      .update({ gameState })
+      .catch(err => rej(err))
+  );
+const getCurrentGameState = gameId =>
+  Promise.resolve(
+    admin
+      .database()
+      .ref($`/games/${gameId}/public/currentSate`)
+      .once(data => res(data.val()["state"]))
+  );
+const isValidMove = (oldMove, newMove) => {
+  return true;
 };
 
-
-module.exports = {createGame};
+module.exports = { createGame, isValidMove, getCurrentGameState, setGameState };

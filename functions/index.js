@@ -1,7 +1,13 @@
 const functions = require("firebase-functions");
 const express = require("express");
-const { isAuthenticated, isVaildMove } = require("./verifier");
-const { setGameState, createGame, joinGame } = require("./game");
+const { isAuthenticated, isAuthorized } = require("./verifier");
+const {
+  setGameState,
+  createGame,
+  joinGame,
+  isValidMove,
+  getCurrentGameState
+} = require("./game");
 
 // Create and Deploy Your First Cloud Functions
 // https://firebase.google.com/docs/functions/write-firebase-functions
@@ -9,10 +15,12 @@ const app = express();
 
 app.put("/setMove", (req, res) => {
   const params = req.body;
-    isAuthenticated(params.token)
-      .then(userId => isVaildMove(params.gameState, userId))
-      .then(gameSate => setGameState(gameSate))
-      .catch(err => res.send(err));
+  isAuthenticated(params.token)
+    .then(userId => isAuthorized(params.gameId, userId))
+    .then(userId => getCurrentGameState(params.gameId, userId))
+    .then(currentGameState => isValidMove(currentGameState,params.futureGameState))
+    .then(futureGameState => setGameState(futureGameState, params.gameId))
+    .catch(err => res.send(err));
 });
 
 app.post("/createGame", (req, res) => {
@@ -26,9 +34,9 @@ app.post("/createGame", (req, res) => {
 app.put("/joinGame", (req, res) => {
   const params = req.body;
   isAuthenticated(params.token)
-  .then(userId => joinGame(params.gameId, userId))
-  .then(gameId => res.send(gameId))
-  .catch(err => res.send(err));
+    .then(userId => joinGame(params.gameId, userId))
+    .then(gameId => res.send(gameId))
+    .catch(err => res.send(err));
 });
 app.all("**", (req, res) => {
   res.sendStatus(404);
