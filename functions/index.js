@@ -34,7 +34,7 @@ app.post("/createGame", (req, res) => {
 app.put("/joinGame", (req, res) => {
   const params = req.body;
   isAuthenticated(params.token)
-    .then(userId => joinGame(params.gameId, userId))
+    .then(user => joinGame(params.gameId, user.uid))
     .then(gameId => res.send(gameId))
     .catch(err => res.send(err));
 });

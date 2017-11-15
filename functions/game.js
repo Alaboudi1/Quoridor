@@ -11,7 +11,9 @@ const createGame = (gameName, userId) =>
   );
 const joinGame = (gameId, userId) =>
   new Promise((res, rej) =>
-    addPlayerToGame(gameId, userId)
+    canJoinGame(gameId)
+      .then(gameId => checkIfsamePlayer(gameId, userId))
+      .then(gameId => addPlayerToGame(gameId, userId))
       .then(gameId => deleteWaitingGame(gameId))
       .then(gameId => res({ gameId }))
       .catch(err => rej(err))
@@ -24,7 +26,27 @@ const generateGameId = () =>
       .child("keys")
       .push().key
   );
-
+const checkIfsamePlayer = (gameId, userId) =>
+  new Promise((res, rej) =>
+    admin
+      .database()
+      .ref(`/games/${gameId}/private/players`)
+      .once("value")
+      .then(
+        data =>
+          data.val().playerOne === userId
+            ? rej({err:"Cannot play against yourself!"})
+            : res(gameId)
+      )
+  );
+const canJoinGame = gameId =>
+  new Promise((res, rej) =>
+    admin
+      .database()
+      .ref(`/waitingGames/${gameId}`)
+      .once("value")
+      .then(data => (data.val() ? res(gameId) : rej({err:"Game does not exist!"})))
+  );
 const addPlayerToGame = (gameId, userId) =>
   new Promise((res, rej) =>
     admin
