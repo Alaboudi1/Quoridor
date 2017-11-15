@@ -1,35 +1,35 @@
-[debug] [2017-11-02T20:22:13.747Z] ----------------------------------------------------------------------
-[debug] [2017-11-02T20:22:13.749Z] Command:       /usr/bin/node /home/abdulaziz/Desktop/code/Quoridor/functions/node_modules/.bin/firebase serve --only functions,hosting
-[debug] [2017-11-02T20:22:13.749Z] CLI Version:   3.14.0
-[debug] [2017-11-02T20:22:13.749Z] Platform:      linux
-[debug] [2017-11-02T20:22:13.749Z] Node Version:  v8.5.0
-[debug] [2017-11-02T20:22:13.749Z] Time:          Thu Nov 02 2017 16:22:13 GMT-0400 (EDT)
-[debug] [2017-11-02T20:22:13.750Z] ----------------------------------------------------------------------
+[debug] [2017-11-15T00:13:27.094Z] ----------------------------------------------------------------------
+[debug] [2017-11-15T00:13:27.096Z] Command:       /usr/bin/node /home/abdulaziz/Desktop/code/Quoridor/functions/node_modules/.bin/firebase serve --only functions,hosting
+[debug] [2017-11-15T00:13:27.096Z] CLI Version:   3.14.0
+[debug] [2017-11-15T00:13:27.096Z] Platform:      linux
+[debug] [2017-11-15T00:13:27.096Z] Node Version:  v8.5.0
+[debug] [2017-11-15T00:13:27.096Z] Time:          Tue Nov 14 2017 19:13:27 GMT-0500 (EST)
+[debug] [2017-11-15T00:13:27.096Z] ----------------------------------------------------------------------
 [debug] 
-[debug] [2017-11-02T20:22:13.759Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
-[debug] [2017-11-02T20:22:13.759Z] > authorizing via signed-in user
-[debug] [2017-11-02T20:22:13.761Z] >>> HTTP REQUEST GET https://admin.firebase.com/v1/projects/quoridor-swe681  
- Thu Nov 02 2017 16:22:13 GMT-0400 (EDT)
-[debug] [2017-11-02T20:22:14.079Z] <<< HTTP RESPONSE 200
-[debug] [2017-11-02T20:22:14.082Z] >>> HTTP REQUEST GET https://admin.firebase.com/v1/database/quoridor-swe681/tokens  
- Thu Nov 02 2017 16:22:14 GMT-0400 (EDT)
-[debug] [2017-11-02T20:22:14.411Z] <<< HTTP RESPONSE 200
+[debug] [2017-11-15T00:13:27.105Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2017-11-15T00:13:27.105Z] > authorizing via signed-in user
+[debug] [2017-11-15T00:13:27.107Z] >>> HTTP REQUEST GET https://admin.firebase.com/v1/projects/quoridor-swe681  
+ Tue Nov 14 2017 19:13:27 GMT-0500 (EST)
+[debug] [2017-11-15T00:13:27.502Z] <<< HTTP RESPONSE 200
+[debug] [2017-11-15T00:13:27.505Z] >>> HTTP REQUEST GET https://admin.firebase.com/v1/database/quoridor-swe681/tokens  
+ Tue Nov 14 2017 19:13:27 GMT-0500 (EST)
+[debug] [2017-11-15T00:13:27.893Z] <<< HTTP RESPONSE 200
 [info] 
 [info] === Serving from '/home/abdulaziz/Desktop/code/Quoridor'...
 [info] 
 [info] i  functions: Preparing to emulate functions.
-[debug] [2017-11-02T20:22:14.680Z] >>> HTTP REQUEST GET https://appengine.googleapis.com/v1/apps/quoridor-swe681  
- Thu Nov 02 2017 16:22:14 GMT-0400 (EDT)
-[debug] [2017-11-02T20:22:14.680Z] >>> HTTP REQUEST GET https://apikeys.googleapis.com/v1/projects/quoridor-swe681/apiKeys  
- Thu Nov 02 2017 16:22:14 GMT-0400 (EDT)
-[debug] [2017-11-02T20:22:14.680Z] >>> HTTP REQUEST GET https://cloudresourcemanager.googleapis.com/v1/projects/quoridor-swe681  
- Thu Nov 02 2017 16:22:14 GMT-0400 (EDT)
-[debug] [2017-11-02T20:22:14.871Z] <<< HTTP RESPONSE 200
-[debug] [2017-11-02T20:22:14.884Z] <<< HTTP RESPONSE 200
-[debug] [2017-11-02T20:22:14.886Z] >>> HTTP REQUEST GET https://mobilesdk-pa.googleapis.com/v1/projects/383909199975/clients/_:getWebAppConfig  
- Thu Nov 02 2017 16:22:14 GMT-0400 (EDT)
-[debug] [2017-11-02T20:22:14.983Z] <<< HTTP RESPONSE 200
-[debug] [2017-11-02T20:22:15.291Z] <<< HTTP RESPONSE 200
+[debug] [2017-11-15T00:13:28.283Z] >>> HTTP REQUEST GET https://appengine.googleapis.com/v1/apps/quoridor-swe681  
+ Tue Nov 14 2017 19:13:28 GMT-0500 (EST)
+[debug] [2017-11-15T00:13:28.284Z] >>> HTTP REQUEST GET https://apikeys.googleapis.com/v1/projects/quoridor-swe681/apiKeys  
+ Tue Nov 14 2017 19:13:28 GMT-0500 (EST)
+[debug] [2017-11-15T00:13:28.284Z] >>> HTTP REQUEST GET https://cloudresourcemanager.googleapis.com/v1/projects/quoridor-swe681  
+ Tue Nov 14 2017 19:13:28 GMT-0500 (EST)
+[debug] [2017-11-15T00:13:28.591Z] <<< HTTP RESPONSE 200
+[debug] [2017-11-15T00:13:28.647Z] <<< HTTP RESPONSE 200
+[debug] [2017-11-15T00:13:28.649Z] >>> HTTP REQUEST GET https://mobilesdk-pa.googleapis.com/v1/projects/383909199975/clients/_:getWebAppConfig  
+ Tue Nov 14 2017 19:13:28 GMT-0500 (EST)
+[debug] [2017-11-15T00:13:28.695Z] <<< HTTP RESPONSE 200
+[debug] [2017-11-15T00:13:29.204Z] <<< HTTP RESPONSE 200
 [info] i  hosting: Serving hosting files from: public
 [info] ✔  hosting: Local server: http://localhost:5000
 
