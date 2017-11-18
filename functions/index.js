@@ -1,14 +1,8 @@
 const functions = require("firebase-functions");
 const express = require("express");
 
-const { isAuthenticated, isAuthorized } = require("./verifier");
-const {
-  setGameState,
-  createGame,
-  joinGame,
-  isValidMove,
-  getCurrentGameState
-} = require("./game");
+const { isAuthenticated, isAuthorized } = require("./auth");
+const { createGame, joinGame, setmove, createUserProfile } = require("./game");
 
 const app = express();
 // app2.use(cors({ origin: true }));
@@ -16,17 +10,15 @@ const app = express();
 app.put("/setMove", (req, res) => {
   const params = req.body;
   isAuthenticated(params.token)
-    .then(user => isAuthorized(params.gameId, user.uid))
-    .then(userId => getCurrentGameState(params.gameId, userId))
-    .then(currentGameState => isValidMove(currentGameState, params.move))
-    .then(futureGameState => setGameState(futureGameState, params.gameId))
+    .then(player => isAuthorized(params.gameId, player.uid))
+    .then(playerId => setmove(playerId, params.gameId, params.move))
     .catch(err => res.send({ err }));
 });
 
 app.post("/createGame", (req, res) => {
   const params = req.body;
   isAuthenticated(params.token)
-    .then(user => createGame(params.gameName, user.uid))
+    .then(player => createGame(params.gameName, player.uid))
     .then(gameId => res.send(gameId))
     .catch(err => res.send({ err }));
 });
@@ -34,12 +26,13 @@ app.post("/createGame", (req, res) => {
 app.put("/joinGame", (req, res) => {
   const params = req.body;
   isAuthenticated(params.token)
-    .then(user => joinGame(params.gameId, user.uid))
+    .then(player => joinGame(params.gameId, player.uid))
     .then(gameId => res.send(gameId))
     .catch(err => res.send(err));
 });
 app.all("**", (req, res) => {
   res.sendStatus(404);
 });
+exports.creatUserProfile = functions.auth.user().onCreate(createUserProfile);
 
 exports.api = functions.https.onRequest(app);

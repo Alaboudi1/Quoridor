@@ -1,22 +1,35 @@
 const admin = require("firebase-admin");
 
-const createGame = (gameName, userId) =>
+const createGame = (gameName, playerId) =>
   new Promise((res, rej) =>
-    generateGameId()
-      .then(gameId => createPriviteGame(userId, gameId))
+    isCurrentlyPlaying(playerId)
+      .then(generateGameId)
+      .then(gameId => createPriviteGame(playerId, gameId))
       .then(gameId => createPublicGame(gameName, gameId))
       .then(gameId => createWaitingGame(gameName, gameId))
+      .then(gameId => setCurrentlyPlaying(playerId, gameId))
       .then(gameId => res({ gameId }))
       .catch(err => rej(err))
   );
-const joinGame = (gameId, userId) =>
+const joinGame = (gameId, playerId) =>
   new Promise((res, rej) =>
     canJoinGame(gameId)
-      .then(gameId => checkIfsamePlayer(gameId, userId))
-      .then(gameId => addPlayerToGame(gameId, userId))
+      .then(gameId => checkIfsamePlayer(gameId, playerId))
+      .then(gameId => addPlayerToGame(gameId, playerId))
+      .then(gameId => setCurrentlyPlaying(playerId, gameId))
       .then(gameId => deleteWaitingGame(gameId))
       .then(gameId => res({ gameId }))
       .catch(err => rej(err))
+  );
+const setMove = (playerId, gameId, futureGameState) =>
+  new Promise((res, rej) =>
+    getCurrentGameState(gameId, userId)
+      .then(currentGameState => isValidMove(currentGameState, futureGameState))
+      .then(futureGameState => isWinnerMove(futureGameState))
+      .then(futureGameState => setNextPlayer(gameId, playerId))
+      .then(futureGameState => updateGameState(futureGameState, gameId))
+      .then(GameState => res(GameState))
+      .catch(err => rej({ err }))
   );
 const generateGameId = () =>
   Promise.resolve(
@@ -26,7 +39,7 @@ const generateGameId = () =>
       .child("keys")
       .push().key
   );
-const checkIfsamePlayer = (gameId, userId) =>
+const checkIfsamePlayer = (gameId, playerId) =>
   new Promise((res, rej) =>
     admin
       .database()
@@ -34,8 +47,8 @@ const checkIfsamePlayer = (gameId, userId) =>
       .once("value")
       .then(
         data =>
-          data.val().playerOne === userId
-            ? rej({err:"Cannot play against yourself!"})
+          data.val().playerOne === playerId
+            ? rej({ err: "Cannot play against yourself!" })
             : res(gameId)
       )
   );
@@ -45,14 +58,18 @@ const canJoinGame = gameId =>
       .database()
       .ref(`/waitingGames/${gameId}`)
       .once("value")
-      .then(data => (data.val() ? res(gameId) : rej({err:"Game does not exist!"})))
+      .then(
+        data =>
+          data.val() ? res(gameId) : rej({ err: "Game does not exist!" })
+      )
   );
-const addPlayerToGame = (gameId, userId) =>
+
+const addPlayerToGame = (gameId, playerId) =>
   new Promise((res, rej) =>
     admin
       .database()
       .ref(`/games/${gameId}/private/players`)
-      .update({ playerTwo: userId })
+      .update({ playerTwo: playerId })
       .then(() => res(gameId))
       .catch(err => rej(err))
   );
@@ -66,12 +83,12 @@ const deleteWaitingGame = gameId =>
       .catch(err => rej(err))
   );
 
-const createPriviteGame = (userId, gameId) =>
+const createPriviteGame = (playerId, gameId) =>
   new Promise((res, rej) =>
     admin
       .database()
       .ref(`/games/${gameId}/private`)
-      .update({ players: { playerOne: userId }, nexPlayer: userId })
+      .update({ players: { playerOne: playerId }, nexPlayer: playerId })
       .then(() => res(gameId))
       .catch(err => rej(err))
   );
@@ -106,11 +123,11 @@ const getInitialState = () => ({
   PawnsPositions: [],
   Winner: 0
 });
-const setGameState = (gameState, gameId) =>
+const updateGameState = (gameState, gameId) =>
   new Promise((res, rej) =>
     admin
       .database()
-      .ref($`/games/${gameId}/public`)
+      .ref(`/games/${gameId}/public`)
       .update({ gameState })
       .then(() => res(gameState))
       .catch(err => rej(err))
@@ -119,17 +136,71 @@ const getCurrentGameState = gameId =>
   Promise.resolve(
     admin
       .database()
-      .ref($`/games/${gameId}/public/currentSate`)
-      .once(data => res(data.val()["state"]))
+      .ref(`/games/${gameId}/public/currentSate`)
+      .once("value")
+      .then(data => res(data.val().state))
   );
 const isValidMove = (oldMove, newMove) => {
   return Promise.resolve();
 };
 
+const createUserProfile = ({ data }) =>
+  new Promise((res, rej) =>
+    admin
+      .database()
+      .ref(`/playersProfiles/${data.uid}`)
+      .update({ numberOfGamesPlayed: 0, won: 0, lost: 0, currentlyPlaying: 0 })
+      .then(() => console.log(data))
+      .catch(err => rej({ err }))
+  );
+const getUserProfile = playerId =>
+  Promise.resolve(
+    admin
+      .database()
+      .ref(`/playersProfiles/${playerId}`)
+      .once("value")
+      .then(data => res(data.val()))
+  );
+const isCurrentlyPlaying = playerId =>
+  new Promise((res, rej) =>
+    admin
+      .database()
+      .ref(`/playersProfiles/${playerId}`)
+      .once("value")
+      .then(
+        data =>
+          data.val().currentlyPlaying != 0
+            ? rej("You already playing another game!")
+            : res()
+      )
+      .catch(err => rej(err))
+  );
+const setCurrentlyPlaying = (playerId, gameId) =>
+  new Promise((res, rej) =>
+    admin
+      .database()
+      .ref(`/playersProfiles/${playerId}`)
+      .update({ currentlyPlaying: gameId })
+      .then(() => res(gameId))
+      .catch(err => rej(err))
+  );
+const updatePlayerProfile = (playerId, update) =>
+  new Promise((res, rej) =>
+    admin
+      .database()
+      .ref(`/playersProfiles/${playerId}`)
+      .update({
+        numberOfGamesPlayed: updaye.numberOfGamesPlayed,
+        won: update.numberOfGamesPlayed,
+        lost: update.lost,
+        currentlyPlaying: update.currentlyPlaying
+      })
+      .then(() => res(playerId))
+      .catch(err => rej({ err }))
+  );
 module.exports = {
   createGame,
-  isValidMove,
-  getCurrentGameState,
-  setGameState,
-  joinGame
+  joinGame,
+  createUserProfile,
+  setMove
 };
