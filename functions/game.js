@@ -1,3 +1,5 @@
+import { Promise } from "firebase";
+
 const admin = require("firebase-admin");
 
 const createGame = (gameName, playerId) =>
@@ -13,8 +15,8 @@ const createGame = (gameName, playerId) =>
   );
 const joinGame = (gameId, playerId) =>
   new Promise((res, rej) =>
-    canJoinGame(gameId)
-      .then(gameId => checkIfsamePlayer(gameId, playerId))
+    isCurrentlyPlaying(playerId)
+      .then(gameId => canJoinGame(gameId))
       .then(gameId => addPlayerToGame(gameId, playerId))
       .then(gameId => setCurrentlyPlaying(playerId, gameId))
       .then(gameId => deleteWaitingGame(gameId))
@@ -25,8 +27,8 @@ const setMove = (playerId, gameId, futureGameState) =>
   new Promise((res, rej) =>
     getCurrentGameState(gameId, userId)
       .then(currentGameState => isValidMove(currentGameState, futureGameState))
-      .then(futureGameState => isWinnerMove(futureGameState))
-      .then(futureGameState => setNextPlayer(gameId, playerId))
+      .then(futureGameState => isWinnerMove(futureGameState, gameId, playerId))
+      .then(() => setNextPlayer(gameId, playerId))
       .then(futureGameState => updateGameState(futureGameState, gameId))
       .then(GameState => res(GameState))
       .catch(err => rej({ err }))
@@ -38,19 +40,6 @@ const generateGameId = () =>
       .ref()
       .child("keys")
       .push().key
-  );
-const checkIfsamePlayer = (gameId, playerId) =>
-  new Promise((res, rej) =>
-    admin
-      .database()
-      .ref(`/games/${gameId}/private/players`)
-      .once("value")
-      .then(
-        data =>
-          data.val().playerOne === playerId
-            ? rej({ err: "Cannot play against yourself!" })
-            : res(gameId)
-      )
   );
 const canJoinGame = gameId =>
   new Promise((res, rej) =>
@@ -116,13 +105,38 @@ const createWaitingGame = (gameName, gameId) =>
       .then(() => res(gameId))
       .catch(err => rej(err))
   );
+//not yet completed
+const isWinnerMove = (futureGameState, gameId, playerId) => {
+  const winner =
+    WinningPosition.find(futureGameState.playerOne.position) ||
+    WinningPosition.find(futureGameState.playerOne.position)
+      ? playerId
+      : 0;
 
+  return new Promise((res, rej) =>
+    admin
+      .database()
+      .ref(`/waitingGames/${gameId}`)
+      .update({ winner })
+      .then(() => res(gameId))
+      .catch(err => rej(err))
+  );
+};
 const getInitialState = () => ({
   playerOne: { position: 0, reminingPawns: 6 },
   playerTwo: { position: 0, reminingPawns: 6 },
   PawnsPositions: [],
   Winner: 0
 });
+const setNextPlayer = (gameId, playerId) =>
+  new Promise((res, rej) =>
+    admin
+      .database()
+      .ref(`/games/${gameId}/private`)
+      .update({ nextPlayer: playerId })
+      .then(() => res())
+      .catch(err => rej(err))
+  );
 const updateGameState = (gameState, gameId) =>
   new Promise((res, rej) =>
     admin
@@ -150,7 +164,6 @@ const createUserProfile = ({ data }) =>
       .database()
       .ref(`/playersProfiles/${data.uid}`)
       .update({ numberOfGamesPlayed: 0, won: 0, lost: 0, currentlyPlaying: 0 })
-      .then(() => console.log(data))
       .catch(err => rej({ err }))
   );
 const getUserProfile = playerId =>
