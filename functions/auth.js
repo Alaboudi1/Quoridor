@@ -8,7 +8,7 @@ const isAuthenticated = idToken =>
       .auth()
       .verifyIdToken(idToken)
       .then(decodedToken => res(decodedToken))
-      .catch(err => rej({err: "Failed to Authenticate"}))
+      .catch(err => rej({ err: "Failed to Authenticate" }))
   );
 const isAuthorized = (gameId, userId) =>
   new Promise((res, rej) =>
@@ -19,6 +19,14 @@ const isAuthorized = (gameId, userId) =>
         data =>
           data.val()["id"] === userId ? res(userId) : rej("Not Authorized")
       )
-      .catch(err => rej({err: "Unauthorized Access"}))
+      .catch(err => rej({ err: "Unauthorized Access" }))
   );
-module.exports = { isAuthenticated, isAuthorized };
+const getPlayerInfo = uid =>
+  new Promise((res, rej) =>
+    admin
+      .auth()
+      .getUser(uid)
+      .then(player => res(player))
+      .catch(err => rej({ err: "Failed to Authenticate" }))
+  );
+module.exports = { isAuthenticated, isAuthorized, getPlayerInfo };

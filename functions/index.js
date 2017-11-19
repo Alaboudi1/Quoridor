@@ -1,8 +1,14 @@
 const functions = require("firebase-functions");
 const express = require("express");
 
-const { isAuthenticated, isAuthorized } = require("./auth");
-const { createGame, joinGame, setmove, createUserProfile } = require("./game");
+const { isAuthenticated, isAuthorized, getPlayerInfo } = require("./auth");
+const {
+  createGame,
+  joinGame,
+  setmove,
+  createPlayerProfile,
+  getLeaderBoard
+} = require("./game");
 
 const app = express();
 // app2.use(cors({ origin: true }));
@@ -30,9 +36,16 @@ app.put("/joinGame", (req, res) => {
     .then(gameId => res.send(gameId))
     .catch(err => res.send(err));
 });
+app.get("/leaderboard", (req, res) => {
+  const params = req.headers;
+  isAuthenticated(params.token)
+    .then(getLeaderBoard)
+    .then(leaderBoard => res.send(leaderBoard))
+    .catch(err => res.send({ err }));
+});
 app.all("**", (req, res) => {
   res.sendStatus(404);
 });
-exports.creatUserProfile = functions.auth.user().onCreate(createUserProfile);
+exports.creatUserProfile = functions.auth.user().onCreate(createPlayerProfile);
 
 exports.api = functions.https.onRequest(app);

@@ -52,7 +52,7 @@ class index {
   checkStatus(user) {
     if (user) {
       this.user.setInfo(user.displayName, user.uid);
-      user.getToken(/* forceRefresh */ true).then(token => console.log(token, user));
+      user.getIdToken(true).then(token => console.log(token, user));
       this.show(logOut);
       this.show(lableName);
       this.show(mainPage);

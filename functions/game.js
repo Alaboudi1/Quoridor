@@ -1,5 +1,3 @@
-import { Promise } from "firebase";
-
 const admin = require("firebase-admin");
 
 const createGame = (gameName, playerId) =>
@@ -33,6 +31,26 @@ const setMove = (playerId, gameId, futureGameState) =>
       .then(GameState => res(GameState))
       .catch(err => rej({ err }))
   );
+const getLeaderBoard = () =>
+  new Promise((res, rej) =>
+    admin
+      .database()
+      .ref("/playersProfiles")
+      .once("value")
+      .then(data => data.val())
+      .then(players => Object.keys(players).map(key => players[key]))
+      .then(players =>
+        players.map(({ lost, won, numberOfGamesPlayed, userName }) => ({
+          lost,
+          won,
+          numberOfGamesPlayed,
+          userName
+        }))
+      )
+      .then(players => res(players))
+      .catch(err => rej({ err }))
+  );
+
 const generateGameId = () =>
   Promise.resolve(
     admin
@@ -158,12 +176,18 @@ const isValidMove = (oldMove, newMove) => {
   return Promise.resolve();
 };
 
-const createUserProfile = ({ data }) =>
+const createPlayerProfile = ({ data }) =>
   new Promise((res, rej) =>
     admin
       .database()
       .ref(`/playersProfiles/${data.uid}`)
-      .update({ numberOfGamesPlayed: 0, won: 0, lost: 0, currentlyPlaying: 0 })
+      .update({
+        numberOfGamesPlayed: 0,
+        won: 0,
+        lost: 0,
+        currentlyPlaying: 0,
+        userName: data.email
+      })
       .catch(err => rej({ err }))
   );
 const getUserProfile = playerId =>
@@ -214,6 +238,7 @@ const updatePlayerProfile = (playerId, update) =>
 module.exports = {
   createGame,
   joinGame,
-  createUserProfile,
-  setMove
+  createPlayerProfile,
+  setMove,
+  getLeaderBoard
 };
