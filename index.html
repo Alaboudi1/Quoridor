@@ -3,8 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <title>Quoridor</title>
+    <link rel="stylesheet" href="src/style.css" type="text/css">
 </head>
 <body>
+
+<nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand">Quoridor</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div>
+        <h1>Player 1 Walls: <span class="label label-default" id="label_p1_Wall">10</span></h1>
+        <h1>Player 2 Walls: <span class="label label-default" id="label_p2_Wall">10</span></h1>
+    </div>
+    <div id="gameFieldDiv"></div>
+</div>
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 <script src="dist/bundle.js"> </script>
 </body>
 </html>

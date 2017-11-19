@@ -1,11 +1,21 @@
-
 // Here should go all the javascript code, you could aslo import whatever you want for example:
 
-import {logic} from './logic';
+import {serverCommunication} from "./serverCommunication";
+import {drawBoard} from './drawBoard';
+import {gameLogic} from './gameLogic';
+import {drawGameInfo} from './drawGameInfo';
 
 class index {
     constructor() {
-        new logic().sayHello('Abdulaziz'); // this going to print Hello to Abdulaziz in the console
+
+        let serverCom = new serverCommunication();
+        let logic = new gameLogic();
+        let drawer = new drawBoard();
+        let gameInfo = new drawGameInfo();
+
+        serverCom.init();
+
+
     }
 }
 
