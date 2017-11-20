@@ -8,7 +8,6 @@ var entry = pro
       "webpack/hot/dev-server",
       "webpack-dev-server/client?http://localhost:8080"
     ];
-console.log(pro);
 var plugins = pro
   ? []
   : [new webpack.HotModuleReplacementPlugin()];

@@ -10,7 +10,7 @@ const {
   getLeaderBoard
 } = require("./game");
 const corsOptions = {
-  origin: "https://us-central1-quoridor-swe681.cloudfunctions.net",
+  origin: "https://quoridor-swe681.firebaseapp.com",
   optionsSuccessStatus: 200
 };
 const helmet = require("helmet");
@@ -24,7 +24,8 @@ app.use(
 app.use(
   helmet.contentSecurityPolicy({
     directives: {
-      defaultSrc: ["'none'"]
+      defaultSrc: ["'none'"],
+      frameAncestors: ["'none'"]
     }
   })
 );

@@ -11,8 +11,8 @@ export class db {
   }
   createNewWaitingGame(gameName, idToken) {
     this.cancelWaitingGamesSubscribtion();
-    fetch("https://us-central1-quoridor-swe681.cloudfunctions.net/api", {
-      method: "POST",
+    fetch("https://us-central1-quoridor-swe681.cloudfunctions.net/api/leaderboard", {
+      method: "GET",
       token: idToken,
       body: {
         gameName

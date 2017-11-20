@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "cross-env ENV_VAR=production rimraf dist&& webpack -p",
+    "build": "cross-env ENV_VAR=production && webpack -p",
     "dev": "set ENV_VAR=development&&node dev-server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
