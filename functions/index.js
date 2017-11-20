@@ -1,6 +1,6 @@
 const functions = require("firebase-functions");
 const express = require("express");
-
+const cors = require("cors");
 const { isAuthenticated, isAuthorized, getPlayerInfo } = require("./auth");
 const {
   createGame,
@@ -9,9 +9,26 @@ const {
   createPlayerProfile,
   getLeaderBoard
 } = require("./game");
-
+const corsOptions = {
+  origin: "https://us-central1-quoridor-swe681.cloudfunctions.net",
+  optionsSuccessStatus: 200
+};
+const helmet = require("helmet");
 const app = express();
-// app2.use(cors({ origin: true }));
+app.use(
+  helmet.hsts({
+    maxAge: 7776000000,
+    includeSubdomains: true
+  })
+);
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'none'"]
+    }
+  })
+);
+app.use(cors(corsOptions));
 
 app.put("/setMove", (req, res) => {
   const params = req.body;

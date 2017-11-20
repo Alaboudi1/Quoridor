@@ -1,14 +1,17 @@
 var path = require("path");
 var webpack = require("webpack");
-var pro = process.env.NODE_ENV === "production";
+const pro = process.argv.indexOf("-p") !== -1;
 var entry = pro
   ? ["./src/index.js"]
   : [
-    "./src/index.js",
-    "webpack/hot/dev-server",
-    "webpack-dev-server/client?http://localhost:8080"
-  ];
-var plugins = pro ? [] : [new webpack.HotModuleReplacementPlugin()];
+      "./src/index.js",
+      "webpack/hot/dev-server",
+      "webpack-dev-server/client?http://localhost:8080"
+    ];
+console.log(pro);
+var plugins = pro
+  ? []
+  : [new webpack.HotModuleReplacementPlugin()];
 
 module.exports = {
   entry,
