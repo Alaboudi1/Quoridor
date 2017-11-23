@@ -4,7 +4,7 @@ const createGame = (gameName, playerId) =>
   new Promise((res, rej) =>
     isCurrentlyPlaying(playerId)
       .then(generateGameId)
-      .then(gameId => createPriviteGame(playerId, gameId))
+      .then(gameId => createPrivateGame(playerId, gameId))
       .then(gameId => createPublicGame(gameName, gameId))
       .then(gameId => createWaitingGame(gameName, gameId))
       .then(gameId => setCurrentlyPlaying(playerId, gameId))
@@ -90,7 +90,7 @@ const deleteWaitingGame = gameId =>
       .catch(err => rej(err))
   );
 
-const createPriviteGame = (playerId, gameId) =>
+const createPrivateGame = (playerId, gameId) =>
   new Promise((res, rej) =>
     admin
       .database()
@@ -141,9 +141,9 @@ const isWinnerMove = (futureGameState, gameId, playerId) => {
   );
 };
 const getInitialState = () => ({
-  playerOne: { position: 0, reminingPawns: 6 },
-  playerTwo: { position: 0, reminingPawns: 6 },
-  PawnsPositions: [],
+  playerOne: { position: {x: 0, y:0}, remainingWalls: 6 },
+  playerTwo: { position: {x: 0, y:0}, remainingWalls: 6 },
+  wallsPosition: [],
   Winner: 0
 });
 const setNextPlayer = (gameId, playerId) =>

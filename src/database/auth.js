@@ -25,7 +25,7 @@ export class auth {
   getIdToken() {
     return new Promise((res, rej) => {
       this.auth.currentUser
-        .getToken(true)
+        .getIdToken(true)
         .then(idToken => res(idToken))
         .catch(err => rej(err));
     });

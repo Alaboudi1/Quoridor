@@ -5,7 +5,7 @@ const { isAuthenticated, isAuthorized, getPlayerInfo } = require("./auth");
 const {
   createGame,
   joinGame,
-  setmove,
+  setMove,
   createPlayerProfile,
   getLeaderBoard
 } = require("./game");
@@ -35,12 +35,12 @@ app.put("/setMove", (req, res) => {
   const params = req.body;
   isAuthenticated(params.token)
     .then(player => isAuthorized(params.gameId, player.uid))
-    .then(playerId => setmove(playerId, params.gameId, params.move))
+    .then(playerId => setMove(playerId, params.gameId, params.move))
     .catch(err => res.send({ err }));
 });
 
 app.post("/createGame", (req, res) => {
-  const params = req.body;
+  const params = JSON.parse(req.body);
   isAuthenticated(params.token)
     .then(player => createGame(params.gameName, player.uid))
     .then(gameId => res.send(gameId))

@@ -17,7 +17,7 @@
           },
           {
             "key": "Content-Security-Policy",
-            "value": "default-src 'none'; base-uri 'none'; connect-src https://quoridor-swe681.firebaseio.com/ wss://s-usc1c-nss-231.firebaseio.com https://securetoken.googleapis.com https://www.googleapis.com/ https://us-central1-quoridor-swe681.cloudfunctions.net 'self'; font-src data: 'self'; frame-ancestors 'none'; img-src 'self'; script-src https://quoridor-swe681.firebaseio.com https://s-usc1c-nss-231.firebaseio.com 'self'; style-src https://quoridor-swe681.firebaseio.com 'self';"
+            "value": "default-src 'none'; base-uri 'none'; connect-src https://s-usc1c-nss-231.firebaseio.com https://quoridor-swe681.firebaseio.com wss://s-usc1c-nss-231.firebaseio.com https://securetoken.googleapis.com https://www.googleapis.com https://us-central1-quoridor-swe681.cloudfunctions.net 'self'; font-src data: 'self'; frame-ancestors 'none'; img-src 'self'; script-src https://quoridor-swe681.firebaseio.com https://s-usc1c-nss-231.firebaseio.com 'self'; style-src 'self';"
           },
           {
             "key": "X-Frame-Options",

@@ -2,26 +2,32 @@ import firebase from "firebase";
 import { config } from "./dbconfig";
 import PubSub from "pubsub-js";
 export class db {
-  // @required subscributions:
+  // @required subscriptions:
   //1.newWaitingGames -> waiting games list.
   constructor() {
     firebase.initializeApp(config);
     this.database = firebase.database();
-    this.newWaitingGameSubscribtion();
+    this.newWaitingGameSubscription();
   }
   createNewWaitingGame(gameName, idToken) {
-    this.cancelWaitingGamesSubscribtion();
-    fetch("https://us-central1-quoridor-swe681.cloudfunctions.net/api/leaderboard", {
-      method: "GET",
-      token: idToken,
-      body: {
-        gameName
+    this.cancelWaitingGamesSubscription();
+    fetch(
+      "https://us-central1-quoridor-swe681.cloudfunctions.net/api/creategame",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          gameName,
+          token: idToken
+        })
       }
-    }).then(gameId => this.publish("currentGame", { gameName, gameId }))
-    .catch(err => this.publish("error", err));
+    )
+      .then(payload => payload.json())
+      .then(payload => (payload.err ? Promise.reject() : payload))
+      .then(gameId => this.publish("currentGame", { gameName, gameId }))
+      .catch(err => this.publish("error", err.err.message));
   }
   //@scope: private
-  generatekey() {
+  generateKey() {
     return this.database
       .ref()
       .child("keys")
@@ -30,7 +36,7 @@ export class db {
   joinExistingGame(gameId, username) {
     this.findThisGame(gameId)
       .then(game => this.removeFromWaitingGames(game))
-      .then(game => this.joningGame(game, username))
+      .then(game => this.joiningGame(game, username))
       .catch(err => console.log(err));
   }
   //@scope: private
@@ -44,13 +50,13 @@ export class db {
     );
   }
   //@scope private
-  joningGame(game, playerName) {
-    const playerTwoId = this.generatekey();
+  joiningGame(game, playerName) {
+    const playerTwoId = this.generateKey();
     const status = {};
     const messages = {};
     const playKey = "none";
     const playerNumber = "playerTwo";
-    this.cancelWaitingGamesSubscribtion();
+    this.cancelWaitingGamesSubscription();
     return new Promise((res, rej) =>
       this.database
         .ref(`/currentGames/${game.gameId}/${playerTwoId}`)
@@ -71,18 +77,17 @@ export class db {
     );
   }
   //TODO
-  RigisterOneMove() {}
+  RegisterOneMove() {}
   ReceiveOneMove() {}
 
-
   //@scope:private
-  newWaitingGameSubscribtion() {
+  newWaitingGameSubscription() {
     this.database
       .ref("waitingGames")
       .on("value", snapshot => this.publish("newWaitingGames", snapshot.val()));
   }
   //@scope:private
-  cancelWaitingGamesSubscribtion() {
+  cancelWaitingGamesSubscription() {
     this.database.ref("waitingGames").off();
   }
   publish(message, data) {
