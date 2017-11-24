@@ -27,7 +27,7 @@ export class gameLogic {
     subscribe() {
 
         // [playerTurn, pawns, walls, availableWalls]
-        PubSub.subscribe("SERVER_DATA", (msg, data) => {
+        PubSub.subscribe("INIT_DATA", (msg, data) => {
             this.playerTurn = data[0];
             this.pawns = data[1];
             this.walls = data[2];
@@ -142,14 +142,14 @@ export class gameLogic {
         // check if the other wall partition is overlapping
 
         if (orientation === 'H') {
-            let nextWall = (wall.Y === 8) ? -1 : 1;
+            let nextWall = (wall.X === 8) ? -1 : 1;
             wallElement = d3.select('#gameSVG').selectAll('.wallH').filter((d) => {
                 return wall.X + nextWall === d.X && wall.Y === d.Y;
             });
         }
         else if (orientation === 'V') {
-            let nextWall = (wall.X === 8) ? -1 : 1;
-            wallElement = d3.select('#gameSVG').selectAll('.wallH').filter((d) => {
+            let nextWall = (wall.Y === 8) ? -1 : 1;
+            wallElement = d3.select('#gameSVG').selectAll('.wallV').filter((d) => {
                 return wall.X === d.X && wall.Y + nextWall === d.Y;
             });
         }
