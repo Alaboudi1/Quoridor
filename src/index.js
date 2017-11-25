@@ -1,29 +1,31 @@
-// Here should go all the javascript code, you could aslo import whatever you want for example:
+// type
 import { auth } from "./database/auth";
-import { db } from "./database/db";
+import { api } from "./database/api";
 import { user } from "./user";
 import PubSub from "pubsub-js";
 
 class index {
   constructor() {
-    this.db = new db();
+    this.api = new api();
     this.auth = new auth();
     this.user = new user();
-    this.subscrube();
+    this.subscribe();
     this.hide(mainPage);
   }
 
   mainPageRender() {
     gamesDIV.innerHTML = "";
     this.existingGames.forEach(
-      element =>
-        (gamesDIV.innerHTML += `<br><button id = ${element.gameId} class = "existingGames" > ${element.gameName}</button>`)
+      game =>
+        (gamesDIV.innerHTML += `<br><button id = ${
+          game.gameId
+        } class = "existingGames" > ${game.gameName}</button>`)
     );
     this.registerEventListeners();
   }
   registerEventListeners() {
     Array.from(document.getElementsByClassName("existingGames")).forEach(ele =>
-      ele.addEventListener("click", () => this.joinAgame(ele.id))
+      ele.addEventListener("click", () => this.joinGame(ele.id))
     );
   }
   manageAuth(action) {
@@ -42,32 +44,47 @@ class index {
     }
   }
   createGame() {
-    this.auth.getIdToken().then(idToken => {
-      this.db.createNewWaitingGame(gameName.value, idToken);
-    });
+    this.api
+      .createNewWaitingGame(gameName.value, this.user.token)
+      .then(gameId => this.user.setGameId(gameId))
+      .then(() => this.api.GameSubscription(gameId))
+      .catch(err => (errMessage.textContent = data));
   }
-  joinAgame(id) {
-    this.db.joinExistingGame(id, this.auth.auth.currentUser.displayName); //need API for name
+  joinGame(gameId) {
+    this.api
+      .joinExistingGame(gameId, this.user.token)
+      .then(gameId => this.user.setGameId(gameId))
+      .then(() => this.api.GameSubscription(gameId))
+      .catch(err => (errMessage.textContent = data));
   }
   checkStatus(user) {
     if (user) {
-      this.user.setInfo(user.displayName, user.uid);
-      user.getIdToken(true).then(token => console.log(token, user));
+      this.user.setName(user.email);
+      this.auth
+        .getIdToken()
+        .then(token => this.user.setToken(token))
+        .then(() =>
+          this.api
+            .getPlayerProfile(this.user.token)
+            .then(profile => this.user.setGameId(profile.currentlyPlaying))
+        )
+        .catch(err => console.log(err));
       this.show(logOut);
-      this.show(lableName);
+      this.show(labelName);
       this.show(mainPage);
+      this.show(leave);
       this.hide(form);
       this.hide(errMessage);
-      if (user.displayName) this.updateUserName(user.displayName);
+      if (user.displayName) this.updateUserName(user.email);
     } else {
-      this.user.setInfo("", "");
+      this.user.setToken("");
       this.show(form);
       this.hide(logOut);
-      this.hide(lableName);
+      this.hide(labelName);
       this.hide(mainPage);
     }
   }
-  subscrube() {
+  subscribe() {
     PubSub.subscribe("newWaitingGames", (mag, data) => {
       if (data) {
         this.existingGames = Object.keys(data).map(key => data[key]);
@@ -76,13 +93,11 @@ class index {
       }
       this.mainPageRender();
     });
-    PubSub.subscribe("currentGame", (meg, data) => (this.currentGame = data)); //waiting for the second player to join!
-    PubSub.subscribe("nameUpdate", (meg, name) => this.updateUserName(name));
+    PubSub.subscribe("gameChange", (meg, data) => console.log(data));
     PubSub.subscribe("authChange", (meg, user) => this.checkStatus(user));
     PubSub.subscribe("error", (msg, data) => {
-      console.log(data.message);
       this.show(errMessage);
-      errMessage.textContent = data.message;
+      errMessage.textContent = data;
     });
   }
   hide(element) {
@@ -93,7 +108,10 @@ class index {
   }
 
   updateUserName(name) {
-    lableName.textContent = `Welcome: ${name}`;
+    labelName.textContent = `Welcome: ${name}`;
+  }
+  leaveGame() {
+    this.api.leaveGame(this.user.gameId, this.user.token);
   }
 }
 
@@ -110,3 +128,4 @@ document
 document
   .getElementById("createGame")
   .addEventListener("click", () => app.createGame());
+document.getElementById("leave").addEventListener("click", () => app.leaveGame());

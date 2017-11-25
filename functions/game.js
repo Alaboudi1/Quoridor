@@ -14,16 +14,16 @@ const createGame = (gameName, playerId) =>
 const joinGame = (gameId, playerId) =>
   new Promise((res, rej) =>
     isCurrentlyPlaying(playerId)
-      .then(gameId => canJoinGame(gameId))
+      .then(() => canJoinGame(gameId))
       .then(gameId => addPlayerToGame(gameId, playerId))
       .then(gameId => setCurrentlyPlaying(playerId, gameId))
       .then(gameId => deleteWaitingGame(gameId))
-      .then(gameId => res({ gameId }))
+      .then(gameId => res(gameId))
       .catch(err => rej(err))
   );
 const setMove = (playerId, gameId, futureGameState) =>
   new Promise((res, rej) =>
-    getCurrentGameState(gameId, userId)
+    getCurrentGameState(gameId)
       .then(currentGameState => isValidMove(currentGameState, futureGameState))
       .then(futureGameState => isWinnerMove(futureGameState, gameId, playerId))
       .then(() => setNextPlayer(gameId, playerId))
@@ -50,7 +50,41 @@ const getLeaderBoard = () =>
       .then(players => res(players))
       .catch(err => rej({ err }))
   );
+const leaveGame = (gameId, playerId) =>
+  new Promise((res, rej) =>
+    getPlayers(gameId)
+      .then(players => {
+        const key = Object.keys(players).filter(
+          key => players[key] != playerId
+        );
+        return players[key];
+      })
+      .then(
+        winner => (typeof winner === undefined ? removeGame(gameId) : winner)
+      )
+      .then(winner => getPlayerProfile(winner))
+      
+      .then(winner => setWinner(gameId, winner.email))//error
 
+
+      // .then(winner => {
+      //   winner.won = winner.won + 1;
+      //   winner.currentlyPlaying = 0;
+      //   return winner;
+      // })
+
+      // .then(winner => updatePlayerProfile(winner.id, winner))
+      // .then(() => getPlayerProfile(playerId))
+      // .then(loser => {
+      //   loser.lost = loser.lost + 1;
+      //   loser.currentlyPlaying = 0;
+      //   return loser;
+      // })
+
+      // .then(loser => updatePlayerProfile(loser.id, loser))
+      .then(p => res(p))
+      .catch(err => rej({ err }))
+  );
 const generateGameId = () =>
   Promise.resolve(
     admin
@@ -69,8 +103,17 @@ const canJoinGame = gameId =>
         data =>
           data.val() ? res(gameId) : rej({ err: "Game does not exist!" })
       )
+      .catch(err => rej(err))
   );
-
+const setWinner = (gameId, playerId) =>
+  new Promise((res, rej) =>
+    admin
+      .database()
+      .ref(`/games/${gameId}/public/gameStatus`)
+      .update({ winner: playerId })
+      .then(() => res(playerId))
+      .catch(err => rej(err))
+  );
 const addPlayerToGame = (gameId, playerId) =>
   new Promise((res, rej) =>
     admin
@@ -108,7 +151,8 @@ const createPublicGame = (gameName, gameId) =>
       .update({
         gameStatus: getInitialState(),
         messages: "waiting for a player to join...",
-        gameName
+        gameName,
+        gameId
       })
       .then(() => res(gameId))
       .catch(err => rej(err))
@@ -119,7 +163,7 @@ const createWaitingGame = (gameName, gameId) =>
     admin
       .database()
       .ref(`/waitingGames/${gameId}`)
-      .update({ gameName })
+      .update({ gameName, gameId })
       .then(() => res(gameId))
       .catch(err => rej(err))
   );
@@ -141,10 +185,10 @@ const isWinnerMove = (futureGameState, gameId, playerId) => {
   );
 };
 const getInitialState = () => ({
-  playerOne: { position: {x: 0, y:0}, remainingWalls: 6 },
-  playerTwo: { position: {x: 0, y:0}, remainingWalls: 6 },
+  playerOne: { position: { x: 0, y: 0 }, remainingWalls: 6 },
+  playerTwo: { position: { x: 0, y: 0 }, remainingWalls: 6 },
   wallsPosition: [],
-  Winner: 0
+  winner: 0
 });
 const setNextPlayer = (gameId, playerId) =>
   new Promise((res, rej) =>
@@ -165,7 +209,7 @@ const updateGameState = (gameState, gameId) =>
       .catch(err => rej(err))
   );
 const getCurrentGameState = gameId =>
-  Promise.resolve(
+  new Promise((res, rej) =>
     admin
       .database()
       .ref(`/games/${gameId}/public/currentSate`)
@@ -186,15 +230,24 @@ const createPlayerProfile = ({ data }) =>
         won: 0,
         lost: 0,
         currentlyPlaying: 0,
-        userName: data.email
+        userName: data.email,
+        id: data.uid
       })
       .catch(err => rej({ err }))
   );
-const getUserProfile = playerId =>
-  Promise.resolve(
+const getPlayerProfile = playerId =>
+  new Promise((res, rej) =>
     admin
       .database()
       .ref(`/playersProfiles/${playerId}`)
+      .once("value")
+      .then(data => res(data.val()))
+  );
+const getPlayers = gameId =>
+  new Promise((res, rej) =>
+    admin
+      .database()
+      .ref(`/games/${gameId}/private/players`)
       .once("value")
       .then(data => res(data.val()))
   );
@@ -208,7 +261,7 @@ const isCurrentlyPlaying = playerId =>
         data =>
           data.val().currentlyPlaying != 0
             ? rej("You already playing another game!")
-            : res()
+            : res(playerId)
       )
       .catch(err => rej(err))
   );
@@ -240,5 +293,7 @@ module.exports = {
   joinGame,
   createPlayerProfile,
   setMove,
-  getLeaderBoard
+  getLeaderBoard,
+  leaveGame,
+  getPlayerProfile
 };

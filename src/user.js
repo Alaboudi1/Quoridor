@@ -1,6 +1,11 @@
 export class user {
-  setInfo(name, uid) {
+  setName(name) {
     this.name = name;
-    this.uid = uid;
+  }
+  setToken(token) {
+    this.token = token;
+  }
+  setGameId(gameId) {
+    this.gameId = gameId;
   }
 }

@@ -1,25 +1,19 @@
 import firebase from "firebase";
 import PubSub from "pubsub-js";
 export class auth {
-  // @required subscributions:
+  // @required Subscription :
   //1. authChange -> the updated status of the user when the auth state changes e.g. user == null means user is no longer loged in.
   constructor() {
     this.auth = firebase.auth();
     this.authenticationStatus();
   }
 
-  // @required subscributions:
-  // 1. nameUpdate -> the name of the user.
-  // 2. error -> the error that occurs while trying to create the user.
+  // @required subscribe  :
+  //1. error -> the error that occurs while trying to create the user.
 
-  signUp(username, pass, name) {
+  signUp(username, pass) {
     this.auth
       .createUserWithEmailAndPassword(username, pass)
-      .then(user => {
-        user.updateProfile({ displayName: name });
-        return user;
-      })
-      .then(user => this.publish("authChange", user))
       .catch(err => this.publish("error", err));
   }
   getIdToken() {
@@ -31,7 +25,7 @@ export class auth {
     });
   }
 
-  // @required subscributions:
+  // @required subscribe :
   // 1. error -> the error that occurs while trying to login the user.
   logIn(username, pass) {
     this.auth
@@ -39,7 +33,7 @@ export class auth {
       .catch(err => this.publish("error", err));
   }
 
-  // @required subscributions:
+  // @required subscribe :
   // 1. error -> the error that occurs while trying to logout the user.
   logout() {
     this.auth.signOut().catch(err => this.publish("error", err));

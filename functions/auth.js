@@ -10,23 +10,37 @@ const isAuthenticated = idToken =>
       .then(decodedToken => res(decodedToken))
       .catch(err => rej({ err: "Failed to Authenticate" }))
   );
-const isAuthorized = (gameId, userId) =>
+const checkTurn = (gameId, playerId) =>
   new Promise((res, rej) =>
     admin
       .database()
-      .ref($`/games/${gameId}/private/nextPlayer`)
-      .once(
-        data =>
-          data.val()["id"] === userId ? res(userId) : rej("Not Authorized")
+      .ref(`/games/${gameId}/private/nextPlayer`)
+      .once("value")
+      .then(
+        data => (data.val().id === playerId ? res(playerId) : rej("Not Authorized"))
       )
       .catch(err => rej({ err: "Unauthorized Access" }))
   );
-const getPlayerInfo = uid =>
+const isPlayingGame = (gameId, playerId) => 
+new Promise((res, rej) =>
+  admin
+    .database()
+    .ref(`/games/${gameId}/private/players`)
+    .once("value")
+    .then(
+      data => 
+        data.val().playerOne === playerId || data.val().playerTwo === playerId
+          ? res({ playerId, gameId })
+          : rej("Not playing this game!")
+    )
+    .catch(err => rej({ err: "Unauthorized Access" }))
+);
+const getPlayerInfo = playerId =>
   new Promise((res, rej) =>
     admin
       .auth()
-      .getUser(uid)
+      .getUser(playerId)
       .then(player => res(player))
       .catch(err => rej({ err: "Failed to Authenticate" }))
   );
-module.exports = { isAuthenticated, isAuthorized, getPlayerInfo };
+module.exports = { isAuthenticated, checkTurn, getPlayerInfo, isPlayingGame };
