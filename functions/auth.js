@@ -17,24 +17,25 @@ const checkTurn = (gameId, playerId) =>
       .ref(`/games/${gameId}/private/nextPlayer`)
       .once("value")
       .then(
-        data => (data.val().id === playerId ? res(playerId) : rej("Not Authorized"))
+        data =>
+          data.val().id === playerId ? res(playerId) : rej("Not Authorized")
       )
       .catch(err => rej({ err: "Unauthorized Access" }))
   );
-const isPlayingGame = (gameId, playerId) => 
-new Promise((res, rej) =>
-  admin
-    .database()
-    .ref(`/games/${gameId}/private/players`)
-    .once("value")
-    .then(
-      data => 
-        data.val().playerOne === playerId || data.val().playerTwo === playerId
-          ? res({ playerId, gameId })
-          : rej("Not playing this game!")
-    )
-    .catch(err => rej({ err: "Unauthorized Access" }))
-);
+const isPlayingGame = (gameId, playerId) =>
+  new Promise((res, rej) =>
+    admin
+      .database()
+      .ref(`/games/${gameId}/private/players`)
+      .once("value")
+      .then(
+        data =>
+          data.val().playerOne === playerId || data.val().playerTwo === playerId
+            ? res({ playerId, gameId })
+            : rej("Not playing this game!")
+      )
+      .catch(err => rej({ err: "Unauthorized Access" }))
+  );
 const getPlayerInfo = playerId =>
   new Promise((res, rej) =>
     admin

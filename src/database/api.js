@@ -23,7 +23,7 @@ export class api {
       )
         .then(payload => payload.json())
         .then(payload => (payload.err ? Promise.reject(payload.err) : payload))
-        .then(players => res(players))
+        .then(payload => res(payload.gameId))
         .catch(err => rej(err))
     );
   }
@@ -54,9 +54,8 @@ export class api {
           gameId
         })
       })
-        .then(payload => payload.json())
         .then(payload => (payload.err ? Promise.reject() : payload))
-        .then(gameId => res(gameId))
+        .then(payload => res(payload.gameId))
         .catch(err => rej(err))
     );
   }

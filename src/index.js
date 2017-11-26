@@ -1,4 +1,3 @@
-// type
 import { auth } from "./database/auth";
 import { api } from "./database/api";
 import { user } from "./user";
@@ -6,10 +5,10 @@ import PubSub from "pubsub-js";
 
 class index {
   constructor() {
+    this.subscribe();
     this.api = new api();
     this.auth = new auth();
     this.user = new user();
-    this.subscribe();
     this.hide(mainPage);
   }
 
@@ -47,28 +46,32 @@ class index {
     this.api
       .createNewWaitingGame(gameName.value, this.user.token)
       .then(gameId => this.user.setGameId(gameId))
-      .then(() => this.api.GameSubscription(gameId))
-      .catch(err => (errMessage.textContent = data));
+      .then(() => this.api.GameSubscription(this.user.gameId))
+      .catch(err => (errMessage.textContent = err));
   }
   joinGame(gameId) {
     this.api
       .joinExistingGame(gameId, this.user.token)
-      .then(gameId => this.user.setGameId(gameId))
-      .then(() => this.api.GameSubscription(gameId))
-      .catch(err => (errMessage.textContent = data));
+      .then(() => this.user.setGameId(gameId))
+      .then(() => this.api.GameSubscription(this.user.gameId))
+      .catch(err => (errMessage.textContent = err));
   }
   checkStatus(user) {
     if (user) {
       this.user.setName(user.email);
-      this.auth
-        .getIdToken()
-        .then(token => this.user.setToken(token))
-        .then(() =>
-          this.api
-            .getPlayerProfile(this.user.token)
-            .then(profile => this.user.setGameId(profile.currentlyPlaying))
-        )
-        .catch(err => console.log(err));
+      setTimeout(
+        () =>
+          this.auth
+            .getIdToken()
+            .then(token => this.user.setToken(token))
+            .then(() =>
+              this.api
+                .getPlayerProfile(this.user.token)
+                .then(profile => this.user.setGameId(profile.currentlyPlaying))
+            )
+            .catch(err => console.log(err)),
+        5000
+      );
       this.show(logOut);
       this.show(labelName);
       this.show(mainPage);
@@ -128,4 +131,6 @@ document
 document
   .getElementById("createGame")
   .addEventListener("click", () => app.createGame());
-document.getElementById("leave").addEventListener("click", () => app.leaveGame());
+document
+  .getElementById("leave")
+  .addEventListener("click", () => app.leaveGame());

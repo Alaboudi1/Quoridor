@@ -49,7 +49,7 @@ app.put("/setMove", (req, res) => {
 app.post("/createGame", (req, res) => {
   const params = JSON.parse(req.body);
   isAuthenticated(params.token)
-    .then(player => createGame(params.gameName, player.uid))
+    .then(player => createGame(params.gameName, player))
     .then(gameId => res.send(gameId))
     .catch(err => res.send({ err }));
 });
@@ -57,7 +57,7 @@ app.post("/createGame", (req, res) => {
 app.put("/joinGame", (req, res) => {
   const params = JSON.parse(req.body);
   isAuthenticated(params.token)
-    .then(player => joinGame(params.gameId, player.uid))
+    .then(player => joinGame(params.gameId, player))
     .then(gameId => res.send(gameId))
     .catch(err => res.send(err));
 });
@@ -66,7 +66,7 @@ app.put("/leaveGame", (req, res) => {
   isAuthenticated(params.token)
     .then(player => isPlayingGame(params.gameId, player.uid))
     .then(({ gameId, playerId }) => leaveGame(gameId, playerId))
-    .then(gameId => res.send(params.gameId))
+    .then(gameId => res.send(gameId))
     .catch(err => res.send({ err }));
 });
 app.get("/leaderBoard", (req, res) => {
