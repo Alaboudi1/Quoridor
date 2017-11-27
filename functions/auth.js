@@ -10,15 +10,15 @@ const isAuthenticated = idToken =>
       .then(decodedToken => res(decodedToken))
       .catch(err => rej({ err: "Failed to Authenticate" }))
   );
-const checkTurn = (gameId, playerId) =>
+const checkTurn = (gameId, player) =>
   new Promise((res, rej) =>
     admin
       .database()
-      .ref(`/games/${gameId}/private/nextPlayer`)
+      .ref(`/games/${gameId}/private`)
       .once("value")
       .then(
         data =>
-          data.val().id === playerId ? res(playerId) : rej("Not Authorized")
+          data.val().nextPlayer === player.uid ? res(player) : rej("Not Authorized")
       )
       .catch(err => rej({ err: "Unauthorized Access" }))
   );

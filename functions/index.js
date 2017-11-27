@@ -39,10 +39,10 @@ app.use(
 app.use(cors(corsOptions));
 
 app.put("/setMove", (req, res) => {
-  const params = req.body;
+  const params = JSON.parse(req.body);
   isAuthenticated(params.token)
-    .then(player => checkTurn(params.gameId, player.uid))
-    .then(playerId => setMove(playerId, params.gameId, params.move))
+    .then(player => checkTurn(params.gameId, player))
+    .then(player => setMove(player, params.gameId, params.move))
     .catch(err => res.send({ err }));
 });
 

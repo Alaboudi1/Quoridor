@@ -34,6 +34,7 @@ class index {
         break;
       case "logOut":
         this.auth.logout();
+        this.api.cancelGamesSubscription(this.user.gameId);
         break;
       case "signUp":
         this.auth.signUp(email.value, pass.value, username.value);
@@ -47,14 +48,14 @@ class index {
       .createNewWaitingGame(gameName.value, this.user.token)
       .then(gameId => this.user.setGameId(gameId))
       .then(() => this.api.GameSubscription(this.user.gameId))
-      .catch(err => (errMessage.textContent = err));
+      .catch(err => console.log(err));
   }
   joinGame(gameId) {
     this.api
       .joinExistingGame(gameId, this.user.token)
       .then(() => this.user.setGameId(gameId))
       .then(() => this.api.GameSubscription(this.user.gameId))
-      .catch(err => (errMessage.textContent = err));
+      .catch(err => console.log(err));
   }
   checkStatus(user) {
     if (user) {
@@ -68,6 +69,12 @@ class index {
               this.api
                 .getPlayerProfile(this.user.token)
                 .then(profile => this.user.setGameId(profile.currentlyPlaying))
+            )
+            .then(
+              () =>
+                this.user.gameId != 0
+                  ? this.api.GameSubscription(this.user.gameId)
+                  : this.user.gameId
             )
             .catch(err => console.log(err)),
         5000
@@ -96,7 +103,12 @@ class index {
       }
       this.mainPageRender();
     });
-    PubSub.subscribe("gameChange", (meg, data) => console.log(data));
+    PubSub.subscribe("gameChange", (meg, data) => {
+      if (data.nextPlayer === 0)
+        this.api.cancelGamesSubscription(this.user.gameId);
+
+      console.log(data);
+    });
     PubSub.subscribe("authChange", (meg, user) => this.checkStatus(user));
     PubSub.subscribe("error", (msg, data) => {
       this.show(errMessage);
@@ -116,7 +128,11 @@ class index {
   leaveGame() {
     this.api.leaveGame(this.user.gameId, this.user.token);
   }
+  playMove(){
+    this.api.setMove(this.user.gameId, this.user.token);
+  }
 }
+
 
 const app = new index();
 document
@@ -134,3 +150,6 @@ document
 document
   .getElementById("leave")
   .addEventListener("click", () => app.leaveGame());
+  document
+  .getElementById("playMove")
+  .addEventListener("click", () => app.playMove());
