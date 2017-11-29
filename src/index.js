@@ -77,6 +77,7 @@ class index {
                   ? this.api.GameSubscription(this.user.gameId)
                   : this.user.gameId
             )
+            .then(() => this.api.newWaitingGameSubscription())
             .catch(err => console.log(err)),
         5000
       );
@@ -97,6 +98,7 @@ class index {
   }
   subscribe() {
     PubSub.subscribe("newWaitingGames", (mag, data) => {
+      console.log(data);
       if (data) {
         this.existingGames = Object.keys(data).map(key => data[key]);
       } else {
@@ -105,7 +107,7 @@ class index {
       this.mainPageRender();
     });
     PubSub.subscribe("gameChange", (meg, data) => {
-      if (data && data.nextPlayer === 0)
+      if (data.nextPlayer === 0)
         //game is over
         this.api.cancelGamesSubscription(this.user.gameId);
 

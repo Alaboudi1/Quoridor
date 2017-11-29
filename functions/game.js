@@ -27,7 +27,7 @@ const joinGame = (gameId, playerTwo) =>
           gameId
         )
       )
-      .then(() => res(gameId))
+      .then(gameId => res(gameId))
       .catch(err => rej(err))
   );
 const setMove = (player, gameId, futureGameState) =>
@@ -182,7 +182,7 @@ const updateGameMessage = (message, gameId) =>
       .database()
       .ref(`/games/${gameId}/public`)
       .update({ message: message })
-      .then(() => res())
+      .then(() => res(gameId))
       .catch(err => rej(err))
   );
 const addPlayerToGame = (gameId, player) =>

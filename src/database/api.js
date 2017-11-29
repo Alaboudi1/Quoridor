@@ -7,7 +7,6 @@ export class api {
   constructor() {
     firebase.initializeApp(config);
     this.database = firebase.database();
-    this.newWaitingGameSubscription();
   }
   createNewWaitingGame(gameName, token) {
     return new Promise((res, rej) =>
@@ -38,8 +37,7 @@ export class api {
           method: "GET"
         }
       )
-        .then(payload => payload.json())
-        .then(payload => (payload.err ? Promise.reject() : payload))
+      .then(payload => (payload.err ? Promise.reject() : payload.json()))      
         .then(players => res(players))
         .catch(err => rej(err))
     );
@@ -54,9 +52,8 @@ export class api {
           gameId
         })
       })
-        .then(payload => payload.json())
-        .then(payload => (payload.err ? Promise.reject(payload.err) : payload))
-        .then(payload => res(payload.gameId))
+      .then(payload => (payload.err ? Promise.reject(payload.err) : payload.json()))      
+        .then(gameId => res(gameId))
         .catch(err => rej(err))
     );
   }
@@ -69,8 +66,7 @@ export class api {
           gameId
         })
       })
-        .then(payload => payload.json())
-        .then(payload => (payload.err ? Promise.reject(payload.err) : payload))
+        .then(payload => (payload.err ? Promise.reject(payload.err) : payload.json()))
         .then(gameId => res(gameId))
         .catch(err => rej(err))
     );
@@ -84,9 +80,8 @@ export class api {
           gameId
         })
       })
-        .then(payload => payload.json())
-        .then(payload => (payload.err ? Promise.reject(payload.err) : payload))
-        .then(payload => res(payload.gameId))
+        .then(payload => (payload.err ? Promise.reject(payload.err) : payload.json()))
+        .then(gameId => res(gameId))
         .catch(err => rej(err))
     );
   }
@@ -100,8 +95,7 @@ export class api {
           method: "GET"
         }
       )
-        .then(payload => (payload.err ? Promise.reject() : payload))
-        .then(payload => payload.json())
+        .then(payload => (payload.err ? Promise.reject() : payload.json()))
         .then(players => res(players))
         .catch(err => rej(err))
     );
