@@ -8,7 +8,7 @@ const isAuthenticated = idToken =>
       .auth()
       .verifyIdToken(idToken)
       .then(decodedToken => res(decodedToken))
-      .catch(err => rej({ err: "Failed to Authenticate" }))
+      .catch(err => rej({ err }))
   );
 const checkTurn = (gameId, player) =>
   new Promise((res, rej) =>

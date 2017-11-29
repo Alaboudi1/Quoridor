@@ -76,7 +76,7 @@ app.get("/leaderBoard", (req, res) => {
     .then(getLeaderBoard)
     .then(leaderBoard => res.send(leaderBoard))
     .catch(err => res.send({ err }));
-  setTimeout(() => console.log(Date.now() - seconds), 60 * 1000);
+  // setTimeout(() => console.log(Date.now() - seconds), 60 * 1000);
 });
 app.get("/getPlayerProfile", (req, res) => {
   const token = req.query.token;

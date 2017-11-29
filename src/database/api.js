@@ -12,7 +12,7 @@ export class api {
   createNewWaitingGame(gameName, token) {
     return new Promise((res, rej) =>
       fetch(
-        "http://localhost:5001/quoridor-swe681/us-central1/api/creategame",
+        "https://us-central1-quoridor-swe681.cloudfunctions.net/api/creategame",
         {
           method: "POST",
           body: JSON.stringify({
@@ -31,7 +31,7 @@ export class api {
   getLeaderBoard(token) {
     return new Promise((res, rej) =>
       fetch(
-        `http://localhost:5001/quoridor-swe681/us-central1/api/leaderboard?token=${
+        `https://us-central1-quoridor-swe681.cloudfunctions.net/api/leaderboard?token=${
           token
         }`,
         {
@@ -47,7 +47,7 @@ export class api {
 
   joinExistingGame(gameId, token) {
     return new Promise((res, rej) =>
-      fetch("http://localhost:5001/quoridor-swe681/us-central1/api/joingame", {
+      fetch("https://us-central1-quoridor-swe681.cloudfunctions.net/api/joingame", {
         method: "put",
         body: JSON.stringify({
           token,
@@ -62,7 +62,7 @@ export class api {
   }
   leaveGame(gameId, token) {
     return new Promise((res, rej) =>
-      fetch("http://localhost:5001/quoridor-swe681/us-central1/api/leavegame", {
+      fetch("https://us-central1-quoridor-swe681.cloudfunctions.net/api/leavegame", {
         method: "put",
         body: JSON.stringify({
           token,
@@ -77,7 +77,7 @@ export class api {
   }
   setMove(gameId, token) {
     return new Promise((res, rej) =>
-      fetch("http://localhost:5001/quoridor-swe681/us-central1/api/setmove", {
+      fetch("https://us-central1-quoridor-swe681.cloudfunctions.net/api/setmove", {
         method: "put",
         body: JSON.stringify({
           token,
@@ -93,7 +93,7 @@ export class api {
   getPlayerProfile(token) {
     return new Promise((res, rej) =>
       fetch(
-        `http://localhost:5001/quoridor-swe681/us-central1/api/getPlayerProfile?token=${
+        `https://us-central1-quoridor-swe681.cloudfunctions.net/api/getPlayerProfile?token=${
           token
         }`,
         {

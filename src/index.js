@@ -61,6 +61,7 @@ class index {
     if (user) {
       this.user.setName(user.email);
       setTimeout(
+        // reconstructing user profile
         () =>
           this.auth
             .getIdToken()
@@ -104,10 +105,11 @@ class index {
       this.mainPageRender();
     });
     PubSub.subscribe("gameChange", (meg, data) => {
-      if (data.nextPlayer === 0)
+      if (data && data.nextPlayer === 0)
+        //game is over
         this.api.cancelGamesSubscription(this.user.gameId);
 
-      console.log(data);
+      console.log(data.message);
     });
     PubSub.subscribe("authChange", (meg, user) => this.checkStatus(user));
     PubSub.subscribe("error", (msg, data) => {
@@ -128,11 +130,15 @@ class index {
   leaveGame() {
     this.api.leaveGame(this.user.gameId, this.user.token);
   }
-  playMove(){
-    this.api.setMove(this.user.gameId, this.user.token);
+  playMove(gameState) {
+    this.api.setMove(this.user.gameId, this.user.token, gameState);
+  }
+  getLeaderBoard() {
+    this.api
+      .getLeaderBoard(this.user.token)
+      .then(players => console.log(players));
   }
 }
-
 
 const app = new index();
 document
@@ -150,6 +156,9 @@ document
 document
   .getElementById("leave")
   .addEventListener("click", () => app.leaveGame());
-  document
+document
   .getElementById("playMove")
   .addEventListener("click", () => app.playMove());
+document
+  .getElementById("leaderBoard")
+  .addEventListener("click", () => app.getLeaderBoard());
