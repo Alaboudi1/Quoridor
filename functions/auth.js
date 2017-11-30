@@ -18,11 +18,11 @@ const checkTurn = (gameId, player) =>
       .once("value")
       .then(
         data =>
-          data.val().nextPlayer === player.uid ? res(player) : rej("Not Authorized")
+          data.val().nextPlayer === player.uid ? res(player) : rej("Not Authorized!")
       )
       .catch(err => rej({ err: "Unauthorized Access" }))
   );
-const isPlayingGame = (gameId, playerId) =>
+const isPlayingGame = (gameId, player) =>
   new Promise((res, rej) =>
     admin
       .database()
@@ -30,8 +30,8 @@ const isPlayingGame = (gameId, playerId) =>
       .once("value")
       .then(
         data =>
-          data.val().playerOne === playerId || data.val().playerTwo === playerId
-            ? res({ playerId, gameId })
+          data.val().playerOne === player.uid || data.val().playerTwo === player.uid
+            ? res(player)
             : rej("Not playing this game!")
       )
       .catch(err => rej({ err: "Unauthorized Access" }))

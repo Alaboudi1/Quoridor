@@ -53,7 +53,7 @@ class index {
   joinGame(gameId) {
     this.api
       .joinExistingGame(gameId, this.user.token)
-      .then(() => this.user.setGameId(gameId))
+      .then(gameId => this.user.setGameId(gameId))
       .then(() => this.api.GameSubscription(this.user.gameId))
       .catch(err => console.log(err));
   }
@@ -107,11 +107,12 @@ class index {
       this.mainPageRender();
     });
     PubSub.subscribe("gameChange", (meg, data) => {
+      console.log(data);
+
       if (data.nextPlayer === 0)
         //game is over
         this.api.cancelGamesSubscription(this.user.gameId);
-
-      console.log(data.message);
+      this.timer(60000);
     });
     PubSub.subscribe("authChange", (meg, user) => this.checkStatus(user));
     PubSub.subscribe("error", (msg, data) => {
@@ -129,16 +130,28 @@ class index {
   updateUserName(name) {
     labelName.textContent = `Welcome: ${name}`;
   }
+  timer(sec) {
+    clearTimeout(this.timeout);
+    this.timeout = setTimeout(
+      () => this.api.timeout(this.user.token, this.user.gameId),
+      sec
+    );
+  }
   leaveGame() {
-    this.api.leaveGame(this.user.gameId, this.user.token);
+    this.api
+      .leaveGame(this.user.gameId, this.user.token)
+      .catch(err => console.log(err));
   }
   playMove(gameState) {
-    this.api.setMove(this.user.gameId, this.user.token, gameState);
+    this.api
+      .setMove(this.user.gameId, this.user.token, gameState)
+      .catch(err => console.log(err));
   }
   getLeaderBoard() {
-    this.api
-      .getLeaderBoard(this.user.token)
-      .then(players => console.log(players));
+    // this.api
+    //   .getLeaderBoard(this.user.token)
+    //   .then(players => console.log(players));
+    this.api.timeout(this.user.token, this.user.gameId);
   }
 }
 

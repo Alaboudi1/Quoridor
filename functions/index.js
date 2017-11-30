@@ -14,7 +14,8 @@ const {
   createPlayerProfile,
   getLeaderBoard,
   leaveGame,
-  getPlayerProfile
+  getPlayerProfile,
+  timeout
 } = require("./game");
 const corsOptions = {
   origin: "*", //"https://quoridor-swe681.firebaseapp.com",
@@ -43,6 +44,15 @@ app.put("/setMove", (req, res) => {
   isAuthenticated(params.token)
     .then(player => checkTurn(params.gameId, player))
     .then(player => setMove(player, params.gameId, params.move))
+    .then(() => res(gameId))
+    .catch(err => res.send({ err }));
+});
+app.put("/timeout", (req, res) => {
+  const params = JSON.parse(req.body);
+  isAuthenticated(params.token)
+    .then(player => isPlayingGame(params.gameId, player))
+    .then(player => timeout(player, params.gameId))
+    .then(() => res.send())
     .catch(err => res.send({ err }));
 });
 
@@ -64,8 +74,8 @@ app.put("/joinGame", (req, res) => {
 app.put("/leaveGame", (req, res) => {
   const params = JSON.parse(req.body);
   isAuthenticated(params.token)
-    .then(player => isPlayingGame(params.gameId, player.uid))
-    .then(({ gameId, playerId }) => leaveGame(gameId, playerId))
+    .then(player => isPlayingGame(params.gameId, player))
+    .then((player) => leaveGame(params.gameId, player.uid))
     .then(gameId => res.json(gameId))
     .catch(err => res.send({ err }));
 });

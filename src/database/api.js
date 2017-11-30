@@ -11,7 +11,7 @@ export class api {
   createNewWaitingGame(gameName, token) {
     return new Promise((res, rej) =>
       fetch(
-        "https://us-central1-quoridor-swe681.cloudfunctions.net/api/creategame",
+        "http://localhost:5001/quoridor-swe681/us-central1/api/creategame",
         {
           method: "POST",
           body: JSON.stringify({
@@ -30,14 +30,15 @@ export class api {
   getLeaderBoard(token) {
     return new Promise((res, rej) =>
       fetch(
-        `https://us-central1-quoridor-swe681.cloudfunctions.net/api/leaderboard?token=${
+        `http://localhost:5001/quoridor-swe681/us-central1/api/leaderboard?token=${
           token
         }`,
         {
           method: "GET"
         }
       )
-      .then(payload => (payload.err ? Promise.reject() : payload.json()))      
+        .then(payload => payload.json())
+        .then(payload => (payload.err ? Promise.reject() : payload))
         .then(players => res(players))
         .catch(err => rej(err))
     );
@@ -45,57 +46,90 @@ export class api {
 
   joinExistingGame(gameId, token) {
     return new Promise((res, rej) =>
-      fetch("https://us-central1-quoridor-swe681.cloudfunctions.net/api/joingame", {
-        method: "put",
-        body: JSON.stringify({
-          token,
-          gameId
-        })
-      })
-      .then(payload => (payload.err ? Promise.reject(payload.err) : payload.json()))      
+      fetch(
+        "http://localhost:5001/quoridor-swe681/us-central1/api/joingame",
+        {
+          method: "put",
+          body: JSON.stringify({
+            token,
+            gameId
+          })
+        }
+      )
+        .then(payload => payload.json())
+        .then(payload => (payload.err ? rej(payload.err) : payload))
         .then(gameId => res(gameId))
-        .catch(err => rej(err))
+        .catch(err => {
+          throw new Error(err);
+        })
     );
   }
   leaveGame(gameId, token) {
     return new Promise((res, rej) =>
-      fetch("https://us-central1-quoridor-swe681.cloudfunctions.net/api/leavegame", {
-        method: "put",
-        body: JSON.stringify({
-          token,
-          gameId
-        })
-      })
-        .then(payload => (payload.err ? Promise.reject(payload.err) : payload.json()))
+      fetch(
+        "http://localhost:5001/quoridor-swe681/us-central1/api/leavegame",
+        {
+          method: "put",
+          body: JSON.stringify({
+            token,
+            gameId
+          })
+        }
+      )
+        .then(payload => payload.json())
+        .then(payload => (payload.err ? Promise.reject(payload.err) : payload))
         .then(gameId => res(gameId))
         .catch(err => rej(err))
     );
   }
   setMove(gameId, token) {
     return new Promise((res, rej) =>
-      fetch("https://us-central1-quoridor-swe681.cloudfunctions.net/api/setmove", {
+      fetch(
+        "http://localhost:5001/quoridor-swe681/us-central1/api/setmove",
+        {
+          method: "put",
+          body: JSON.stringify({
+            token,
+            gameId
+          })
+        }
+      )
+        .then(payload => payload.json())
+        .then(payload => (payload.err ? Promise.reject(payload.err) : payload))
+        .then(gameId => res(gameId))
+        .catch(err => rej(err))
+    );
+  }
+  timeout(token, gameId){
+    return new Promise((res, rej) =>
+    fetch(
+      " http://localhost:5001/quoridor-swe681/us-central1/api/timeout",
+      {
         method: "put",
         body: JSON.stringify({
           token,
           gameId
         })
-      })
-        .then(payload => (payload.err ? Promise.reject(payload.err) : payload.json()))
-        .then(gameId => res(gameId))
-        .catch(err => rej(err))
-    );
+      }
+    )
+      .then(payload => payload.json())
+      .then(payload => (payload.err ? Promise.reject(payload.err) : payload))
+      .then(gameId => res(gameId))
+      .catch(err => rej(err))
+  );
   }
   getPlayerProfile(token) {
     return new Promise((res, rej) =>
       fetch(
-        `https://us-central1-quoridor-swe681.cloudfunctions.net/api/getPlayerProfile?token=${
+        `http://localhost:5001/quoridor-swe681/us-central1/api/getPlayerProfile?token=${
           token
         }`,
         {
           method: "GET"
         }
       )
-        .then(payload => (payload.err ? Promise.reject() : payload.json()))
+        .then(payload => payload.json())
+        .then(payload => (payload.err ? Promise.reject() : payload))
         .then(players => res(players))
         .catch(err => rej(err))
     );
