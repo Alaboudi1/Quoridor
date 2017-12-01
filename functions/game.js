@@ -80,7 +80,7 @@ const timeout = (player, gameId) =>
       .then(nextPlayer =>
         getTimeStamp(gameId).then(timeStamp => {
           console.log(nextPlayer);
-          Date.now() - timeStamp > 650
+          Date.now() - timeStamp > 65000
             ? res(switchPlayer(gameId, nextPlayer))
             : rej(`Time remaining ${60 - (Date.now() - timeStamp) / 1000}`);
         })

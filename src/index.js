@@ -12,42 +12,72 @@ class index {
     this.hide(mainPage);
   }
 
-  mainPageRender() {
-    gamesDIV.innerHTML = "";
+  waitingGameRender() {
+    waitingGames.innerHTML = "";
     this.existingGames.forEach(
       game =>
-        (gamesDIV.innerHTML += `<br><button id = ${
+        (waitingGames.innerHTML += `<button type="button" id="${
           game.gameId
-        } class = "existingGames" > ${game.gameName}</button>`)
+        }" class="two waitingGame">Join ${game.gameName}</button>
+        `)
     );
     this.registerEventListeners();
   }
   registerEventListeners() {
-    Array.from(document.getElementsByClassName("existingGames")).forEach(ele =>
+    Array.from(document.getElementsByClassName("waitingGame")).forEach(ele =>
       ele.addEventListener("click", () => this.joinGame(ele.id))
     );
   }
-  manageAuth(action) {
+  manageAuth(action, e) {
+    e.preventDefault();
     switch (action) {
       case "logIn":
         this.auth.logIn(email.value, pass.value);
         break;
       case "logOut":
         this.auth.logout();
+        this.hide(mainPage);
+        this.hide(login);
+        this.show(homePage);
+        this.hide(leaderboard);
         this.api.cancelGamesSubscription(this.user.gameId);
         break;
       case "signUp":
-        this.auth.signUp(email.value, pass.value, username.value);
+        if (pass.value.length < 8) {
+          errMessage.textContent =
+            "Password has to be at least 8 characters in length";
+          this.show(errMessage);
+        } else {
+          this.hide(errMessage);
+          this.auth.signUp(email.value, pass.value);
+        }
         break;
       default:
         throw new Error("UnsupportedOperation:manageAuth");
     }
   }
+  displaytable() {
+    this.hide(mainPage);
+    this.show(leaderboard);
+    document.getElementById("backButton").addEventListener("click", () => {
+      this.hide(leaderboard);
+      this.show(mainPage);
+    });
+  }
+  displayAuthFormPage() {
+    this.show(authForm);
+    this.hide(homePage);
+  }
+
   createGame() {
     this.api
-      .createNewWaitingGame(gameName.value, this.user.token)
+      .createNewWaitingGame(newGame.value, this.user.token)
       .then(gameId => this.user.setGameId(gameId))
       .then(() => this.api.GameSubscription(this.user.gameId))
+      .then(() => {
+        this.hide(mainPage);
+        this.show(gameDIV);
+      })
       .catch(err => console.log(err));
   }
   joinGame(gameId) {
@@ -55,6 +85,10 @@ class index {
       .joinExistingGame(gameId, this.user.token)
       .then(gameId => this.user.setGameId(gameId))
       .then(() => this.api.GameSubscription(this.user.gameId))
+      .then(() => {
+        this.hide(mainPage);
+        this.show(gameDIV);
+      })
       .catch(err => console.log(err));
   }
   checkStatus(user) {
@@ -77,22 +111,31 @@ class index {
                   ? this.api.GameSubscription(this.user.gameId)
                   : this.user.gameId
             )
+            .then(() => {
+              if (this.user.gameId != 0) {
+                this.hide(mainPage);
+                this.show(gameDIV);
+                this.show(errMessage);
+                this.hide(homePage);
+              } else {
+                this.show(lableName);
+                this.show(mainPage);
+                this.hide(authForm);
+                this.hide(homePage);
+              }
+            })
             .then(() => this.api.newWaitingGameSubscription())
+
             .catch(err => console.log(err)),
         5000
       );
-      this.show(logOut);
-      this.show(labelName);
-      this.show(mainPage);
-      this.show(leave);
-      this.hide(form);
-      this.hide(errMessage);
+
       if (user.displayName) this.updateUserName(user.email);
+      lableName.textContent = `Welcome ${this.user.name}`;
     } else {
       this.user.setToken("");
-      this.show(form);
-      this.hide(logOut);
-      this.hide(labelName);
+      this.show(homePage);
+      this.hide(lableName);
       this.hide(mainPage);
     }
   }
@@ -104,7 +147,7 @@ class index {
       } else {
         this.existingGames = [];
       }
-      this.mainPageRender();
+      this.waitingGameRender();
     });
     PubSub.subscribe("gameChange", (meg, data) => {
       console.log(data);
@@ -112,7 +155,7 @@ class index {
       if (data.nextPlayer === 0)
         //game is over
         this.api.cancelGamesSubscription(this.user.gameId);
-      this.timer(60000);
+      else this.timer(10000);
     });
     PubSub.subscribe("authChange", (meg, user) => this.checkStatus(user));
     PubSub.subscribe("error", (msg, data) => {
@@ -133,7 +176,11 @@ class index {
   timer(sec) {
     clearTimeout(this.timeout);
     this.timeout = setTimeout(
-      () => this.api.timeout(this.user.token, this.user.gameId),
+      () =>
+        this.api.timeout(this.user.token, this.user.gameId).catch(err => {
+          console.log(err);
+          if (err.indexOf("Time") != 0) this.timer(sec);
+        }),
       sec
     );
   }
@@ -148,23 +195,47 @@ class index {
       .catch(err => console.log(err));
   }
   getLeaderBoard() {
-    // this.api
-    //   .getLeaderBoard(this.user.token)
-    //   .then(players => console.log(players));
-    this.api.timeout(this.user.token, this.user.gameId);
+    this.api
+      .getLeaderBoard(this.user.token)
+      .then(players => console.log(players));
   }
 }
 
 const app = new index();
+// document
+//   .getElementById("logIn")
+//   .addEventListener("click", () => app.manageAuth("logIn"));
+// document
+//   .getElementById("logOut")
+//   .addEventListener("click", () => app.manageAuth("logOut"));
+// document
+//   .getElementById("signUp")
+//   .addEventListener("click", () => app.manageAuth("signUp"));
+// document
+//   .getElementById("createGame")
+//   .addEventListener("click", () => app.createGame());
+// document
+//   .getElementById("leave")
+//   .addEventListener("click", () => app.leaveGame());
+// document
+//   .getElementById("playMove")
+//   .addEventListener("click", () => app.playMove());
+// document
+//   .getElementById("leaderBoard")
+//   .addEventListener("click", () => app.getLeaderBoard());
+
+document
+  .getElementById("authButton")
+  .addEventListener("click", () => app.displayAuthFormPage());
 document
   .getElementById("logIn")
-  .addEventListener("click", () => app.manageAuth("logIn"));
+  .addEventListener("click", e => app.manageAuth("logIn", e));
 document
   .getElementById("logOut")
-  .addEventListener("click", () => app.manageAuth("logOut"));
+  .addEventListener("click", e => app.manageAuth("logOut", e));
 document
   .getElementById("signUp")
-  .addEventListener("click", () => app.manageAuth("signUp"));
+  .addEventListener("click", e => app.manageAuth("signUp", e));
 document
   .getElementById("createGame")
   .addEventListener("click", () => app.createGame());
@@ -175,5 +246,5 @@ document
   .getElementById("playMove")
   .addEventListener("click", () => app.playMove());
 document
-  .getElementById("leaderBoard")
-  .addEventListener("click", () => app.getLeaderBoard());
+  .getElementById("gameStats")
+  .addEventListener("click", () => app.displaytable());
