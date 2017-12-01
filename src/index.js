@@ -2,7 +2,10 @@ import { auth } from "./database/auth";
 import { api } from "./database/api";
 import { user } from "./user";
 import PubSub from "pubsub-js";
-
+import { serverCommunication } from "./serverCommunication";
+import { drawBoard } from "./drawBoard";
+import { gameLogic } from "./gameLogic";
+import { drawGameInfo } from "./drawGameInfo";
 class index {
   constructor() {
     this.subscribe();
@@ -10,6 +13,11 @@ class index {
     this.auth = new auth();
     this.user = new user();
     this.hide(mainPage);
+    this.serverCom = new serverCommunication();
+    this.logic = new gameLogic();
+    this.drawer = new drawBoard();
+    this.gameInfo = new drawGameInfo();
+    this.serverCom.init();
   }
 
   waitingGameRender() {
@@ -151,11 +159,13 @@ class index {
     });
     PubSub.subscribe("gameChange", (meg, data) => {
       console.log(data);
-
-      if (data.nextPlayer === 0)
-        //game is over
+      errMessage.textContent = data.message;
+      if (data.nextPlayer === 0) {
         this.api.cancelGamesSubscription(this.user.gameId);
-      else this.timer(10000);
+        this.show(lableName);
+        this.show(mainPage);
+        this.hide(gameDIV);
+      } else this.timer(10000);
     });
     PubSub.subscribe("authChange", (meg, user) => this.checkStatus(user));
     PubSub.subscribe("error", (msg, data) => {
@@ -167,7 +177,7 @@ class index {
     element.style.display = "none";
   }
   show(element) {
-    element.style.display = "";
+    element.style.display = "block";
   }
 
   updateUserName(name) {
@@ -179,7 +189,7 @@ class index {
       () =>
         this.api.timeout(this.user.token, this.user.gameId).catch(err => {
           console.log(err);
-          if (err.indexOf("Time") != 0) this.timer(sec);
+          if (err.indexOf("Time") != -1) this.timer(sec);
         }),
       sec
     );
@@ -202,27 +212,6 @@ class index {
 }
 
 const app = new index();
-// document
-//   .getElementById("logIn")
-//   .addEventListener("click", () => app.manageAuth("logIn"));
-// document
-//   .getElementById("logOut")
-//   .addEventListener("click", () => app.manageAuth("logOut"));
-// document
-//   .getElementById("signUp")
-//   .addEventListener("click", () => app.manageAuth("signUp"));
-// document
-//   .getElementById("createGame")
-//   .addEventListener("click", () => app.createGame());
-// document
-//   .getElementById("leave")
-//   .addEventListener("click", () => app.leaveGame());
-// document
-//   .getElementById("playMove")
-//   .addEventListener("click", () => app.playMove());
-// document
-//   .getElementById("leaderBoard")
-//   .addEventListener("click", () => app.getLeaderBoard());
 
 document
   .getElementById("authButton")
