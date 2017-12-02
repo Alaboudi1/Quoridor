@@ -207,7 +207,34 @@ class index {
   getLeaderBoard() {
     this.api
       .getLeaderBoard(this.user.token)
-      .then(players => console.log(players));
+            .then(players=>this.displayTable(players));
+ }
+ displayTable(players){
+		var html = "<table border='1|1'>";
+		html+="<tr>";
+		html+="<th>"+"Lost"+"</th>";
+		html+="<th>"+"Win"+"</th>";
+		html+="<th>"+"numberOfGamesPlayed"+"</th>";
+		html+="<th>"+"userName"+"</th>";
+		html+="</tr>";
+		for (var i = 0; i < players.length; i++) {        
+		    html+="<tr>";
+        html+="<td>"+players[i].lost+"</td>";
+        html+="<td>"+players[i].won+"</td>";
+        html+="<td>"+players[i].numberOfGamesPlayed+"</td>";
+		    html+="<td>"+players[i].userName+"</td>";
+        html+="</tr>";
+    }
+    html+="</table>";
+	  this.hide(mainPage);
+		this.show(leaderboard);
+		document.
+		getElementById("backButton").addEventListener("click",() => {
+			this.hide(leaderboard);
+			this.show(mainPage);
+		
+	});
+    document.getElementById("leadertable").innerHTML = html;
   }
 }
 
