@@ -232,8 +232,5 @@ document
   .getElementById("leave")
   .addEventListener("click", () => app.leaveGame());
 document
-  .getElementById("playMove")
-  .addEventListener("click", () => app.playMove());
-document
   .getElementById("gameStats")
   .addEventListener("click", () => app.displaytable());
