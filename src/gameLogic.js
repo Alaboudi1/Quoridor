@@ -15,7 +15,8 @@ export class gameLogic {
         this.pawns = {};
         this.walls = {H: [], V: []};
         this.potentialPawn = [];
-        this.availableWalls = {p1:0, p2:0};
+        this.availableWalls = {p1: 0, p2: 0};
+        this.playerName = {p1: "player1", p2: "player2"};
 
         this.subscribe();
 
@@ -26,15 +27,18 @@ export class gameLogic {
      */
     subscribe() {
 
-        // [playerTurn, pawns, walls, availableWalls]
+        // [playerTurn, pawns, walls, availableWalls, playerName]
         PubSub.subscribe("INIT_DATA", (msg, data) => {
+
             this.playerTurn = data[0];
             this.pawns = data[1];
             this.walls = data[2];
             this.availableWalls = data[3];
+            this.playerName = data[4];
             this.computePotentialPawn();
 
-            PubSub.publish('MAIN_DATA', [this.playerTurn, this.pawns, this.walls, this.potentialPawn, this.availableWalls]);
+            PubSub.publish('MAIN_DATA', [this.playerTurn, this.pawns, this.walls,
+                this.potentialPawn, this.availableWalls, this.playerName]);
         });
 
         // [wall, H or V]
@@ -43,12 +47,7 @@ export class gameLogic {
             let res = this.verifySelectedWall(data[0], data[1]);
             if (res['result']) {
                 console.log('selected wall!', data);
-                PubSub.publish("SELECTED_WALL", [data]);
-
-
-                // TODO remove
-                this.walls = res['newSetOfWalls'];
-                PubSub.publish("REFRESH_WALLS", [this.walls]);
+                PubSub.publish("SELECTED_WALL", data);
             }
         })
 
@@ -97,7 +96,7 @@ export class gameLogic {
 
         // check if the player used all walls
 
-        if(this.availableWalls[this.playerTurn] === 0)
+        if (this.availableWalls[this.playerTurn] === 0)
             return {result: false};
 
         // check if the wall overlaps with other walls
