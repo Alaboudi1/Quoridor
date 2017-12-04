@@ -175,9 +175,9 @@ class index {
             this.waitingGameRender();
         });
         PubSub.subscribe("gameChange", (meg, data) => {
-            // console.log(data);
+            console.log(data);
             errMessage.textContent = data.message;
-            if (data.nextPlayer === 0) {
+            if (data['gameStatus'].winner !== 0) {
                 this.api.cancelGamesSubscription(this.user.gameId);
                 this.show(lableName);
                 this.show(mainPage);
@@ -219,6 +219,9 @@ class index {
         this.api
             .leaveGame(this.user.gameId, this.user.token)
             .catch(err => console.log(err));
+        this.show(lableName);
+        this.show(mainPage);
+        this.hide(gameDIV);
     }
 
     playMove(gameState) {

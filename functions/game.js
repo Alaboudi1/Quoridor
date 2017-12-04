@@ -39,14 +39,26 @@ const setMove = (player, gameId, futureGameState) =>
             .then(() => timeout(player, gameId))
             .then(() => getCurrentGameState(gameId))
             .then(currentGameState => isValidMove(currentGameState, futureGameState))
-            .then(futureGameState => isWinnerMove(futureGameState, gameId, player.uid))
-            .then(futureGameState => updateGameState(futureGameState.gameState, gameId))
-            .then(gameState => gameState.winner !== 0
-                ? res(updateGameMessage(`The winner is ${player.userName}`, gameId))
-                : res(gameState))
-            .then(() => switchPlayer(gameId, player))
+            .then(futureGameState => isWinnerMove(futureGameState, gameId, player))
+            .then(futureGameState => updateGameState(futureGameState, gameId))
+            .then(futureGameState => futureGameState.gameState.winner !== 0
+                ? res(updateGameMessage(`The winner is ${futureGameState.gameState.winner}`, gameId))
+                : res())
+            .then(() => switchPlayer(gameId, player).then(() => gameEnded(gameId)))
             .then(() => res(gameId))
-            .catch(err => rej(err))
+            .catch(err => {
+                console.log(err);
+                return rej(err)
+            })
+    );
+
+const gameEnded = (gameId) =>
+    new Promise((res, rej) =>
+        getPlayers(gameId)
+            .then(players =>
+                setCurrentlyPlaying(players['playerOne'], 0)
+                    .then(() => setCurrentlyPlaying(players['playerTwo'], 0))
+            ).catch(err => rej(err))
     );
 
 const getLeaderBoard = () =>
@@ -79,12 +91,28 @@ const timeout = (player, gameId) =>
             .then(nextPlayer =>
                 getTimeStamp(gameId).then(timeStamp => {
                     // console.log("nextPlayer: ", nextPlayer);
-                    Date.now() - timeStamp < 65000 ?
-                        res(switchPlayer(gameId, nextPlayer))
-                        : rej(`Time remaining ${60 - (Date.now() - timeStamp) / 1000}`);
+                    Date.now() - timeStamp > 65000 ?
+                        rej(switchPlayer(gameId, nextPlayer).then(() => changePlayerTurn(gameId)))
+                        : res(`Time remaining ${60 - (Date.now() - timeStamp) / 1000}`);
                 })
             )
             .catch(err => rej(err))
+    );
+
+const changePlayerTurn = (gameId) =>
+    new Promise((res, rej) =>
+        getCurrentGameState(gameId)
+            .then((gameState) =>
+                new Promise((res1, rej1) =>
+                    admin
+                        .database()
+                        .ref(`/games/${gameId}/public/gameStatus`)
+                        .update({playerTurn: gameState.playerTurn === 'p1' ? 'p2' : 'p1'})
+                        .then(() => res1())
+                        .catch(err => rej1({err}))
+                )
+            )
+            .catch(err => rej({err}))
     );
 
 const leaveGame = (gameId, playerId) =>
@@ -148,8 +176,14 @@ const generateGameId = () =>
             .child("keys")
             .push().key
     );
-const switchPlayer = (gameId, player) =>
-    new Promise((res, rej) =>
+const switchPlayer = (gameId, player) => {
+    let winner = 0;
+    getCurrentGameState(gameId)
+        .then((gameState) => {
+            winner = gameState.winner;
+            return Promise.resolve()
+        });
+    return new Promise((res, rej) =>
         getPlayers(gameId)
             .then(players => {
                 const key = Object.keys(players).filter(
@@ -159,13 +193,15 @@ const switchPlayer = (gameId, player) =>
             })
             .then(nextPlayerId => getPlayerProfile(nextPlayerId))
             .then(player => {
-                updateGameMessage(`It is ${player.userName}'s turn now.`, gameId);
+                if (winner === 0)
+                    updateGameMessage(`It is ${player.userName}'s turn now.`, gameId);
                 return player;
             })
             .then(({uid, userName}) => setNextPlayer(gameId, uid, userName))
             .then(() => res())
             .catch(err => rej(err))
     );
+}
 const isWaitingGame = gameId =>
     new Promise((res, rej) =>
         admin
@@ -294,18 +330,18 @@ const createWaitingGame = (gameName, gameId) =>
             .catch(err => rej(err))
     );
 
-const isWinnerMove = (futureGameState, gameId, playerId) => {
+const isWinnerMove = (futureGameState, gameId, player) => {
     const winner = (futureGameState.action !== 'PAWN_MOVED') ? 0 :
-        ((futureGameState.location.X === 8 && futureGameState.player === 'p1') ||
-            (futureGameState.location.X === 0 && futureGameState.player === 'p2'))
-            ? playerId
+        ((futureGameState.location.X === 8 && futureGameState.gameState.playerTurn === 'p2') ||
+            (futureGameState.location.X === 0 && futureGameState.gameState.playerTurn === 'p1'))
+            ? player.email
             : 0;
-
+    futureGameState.gameState.winner = winner;
     return new Promise((res, rej) =>
         admin
             .database()
             .ref(`/games/${gameId}/public/gameStatus`) // waitingGames
-            .update({winner})
+            .update({winner: winner})
             .then(() => res(futureGameState))// gameId
             .catch(err => rej(err))
     );
@@ -346,13 +382,13 @@ const updatePublicPlayerName = (gameId, playerId, playerName) =>
             .catch(err => rej(err))
     );
 
-const updateGameState = (gameStatus, gameId) =>
+const updateGameState = (futureGameState, gameId) =>
     new Promise((res, rej) =>
         admin
             .database()
             .ref(`/games/${gameId}/public`)
-            .update({gameStatus})
-            .then(() => res(gameStatus))
+            .update({gameStatus: futureGameState.gameState})
+            .then(() => res(futureGameState))
             .catch(err => rej(err))
     );
 const getCurrentGameState = gameId =>
@@ -364,8 +400,9 @@ const getCurrentGameState = gameId =>
             .then(data => res(data.val()))
     );
 const isValidMove = (currentGameState, futureGameState) => {
-    // console.log(currentGameState);
-    console.log(futureGameState);
+
+    // compare currentGameState and futureGameState
+
     switch (futureGameState['action']) {
         case 'PAWN_MOVED':
             let valid = computePotentialPawn(currentGameState).filter((d) => {
@@ -561,7 +598,7 @@ const isWallNotOverlap = (gameState, wall, orientation) => {
         let wallElement = gameState['walls'][orientation].filter(function (d) {
             return wall.X === d.X && wall.Y === d.Y;
         });
-        console.log("wallElement", wallElement);
+        // console.log("wallElement", wallElement);
         if (wallElement.length > 0)
             return false;
     }
