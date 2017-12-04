@@ -83,15 +83,7 @@ export class serverCommunication {
                 .setMove(this.user.gameId, this.user.token, {
                     player: this.playerTurn,
                     action: 'PAWN_MOVED',
-                    location: data[0],
-                    gameState: {
-                        playerTurn: (this.playerTurn === 'p1' ) ? 'p2' : 'p1',
-                        pawns: futurePawn,
-                        walls: this.walls,
-                        availableWalls: this.availableWalls,
-                        playerName: this.playerName,
-                        winner: this.winner
-                    }
+                    location: data[0]
                 })
                 // .then(res => console.log("returned promise", res))
                 .catch(err => console.log("rejected promise", err))
@@ -113,15 +105,7 @@ export class serverCommunication {
                 .setMove(this.user.gameId, this.user.token, {
                     player: this.playerTurn,
                     action: 'WALL_ADDED',
-                    location: data,
-                    gameState: {
-                        playerTurn: (this.playerTurn === 'p1' ) ? 'p2' : 'p1',
-                        pawns: this.pawns,
-                        walls: newSetOfWalls,
-                        availableWalls: newAvailableWalls,
-                        playerName: this.playerName,
-                        winner: this.winner
-                    }
+                    location: data
                 })
                 // .then(res => console.log("returned promise", res))
                 .catch(err => console.log("rejected promise", err))

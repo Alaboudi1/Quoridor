@@ -33,12 +33,12 @@ const joinGame = (gameId, playerTwo) =>
             .then(() => res(setTimeStamp(gameId)))
             .catch(err => rej(err))
     );
-const setMove = (player, gameId, futureGameState) =>
+const setMove = (player, gameId, futureMove) =>
     new Promise((res, rej) =>
         isNotWaitingGame(gameId)
             .then(() => timeout(player, gameId))
             .then(() => getCurrentGameState(gameId))
-            .then(currentGameState => isValidMove(currentGameState, futureGameState))
+            .then(currentGameState => isValidMove(currentGameState, futureMove))
             .then(futureGameState => isWinnerMove(futureGameState, gameId, player))
             .then(futureGameState => updateGameState(futureGameState, gameId))
             .then(futureGameState => futureGameState.gameState.winner !== 0
@@ -201,7 +201,8 @@ const switchPlayer = (gameId, player) => {
             .then(() => res())
             .catch(err => rej(err))
     );
-}
+};
+
 const isWaitingGame = gameId =>
     new Promise((res, rej) =>
         admin
@@ -352,7 +353,8 @@ const getInitialState = playerOneName => ({
     availableWalls: {p1: 6, p2: 6},
     playerName: {p1: playerOneName, p2: ""},
     playerTurn: "p1",
-    winner: 0
+    winner: 0,
+    history: ["Game is started."]
 });
 
 const setNextPlayer = (gameId, playerId, playerName) =>
@@ -399,23 +401,74 @@ const getCurrentGameState = gameId =>
             .once("value")
             .then(data => res(data.val()))
     );
-const isValidMove = (currentGameState, futureGameState) => {
+const isValidMove = (currentGameState, futureMove) => {
 
-    // compare currentGameState and futureGameState
+    if (!validData)
+        return Promise.reject("Invalid Data");
+
+    let futureGameState = {
+        player: futureMove.player,
+        action: futureMove.action,
+        location: futureMove.location,
+        gameState: {
+            playerTurn: currentGameState.playerTurn === 'p2' ? 'p1' : 'p2',
+            pawns: {p1: {X: 0, Y: 4}, p2: {X: 8, Y: 4}}, // update
+            walls: {H: [], V: []}, // update
+            availableWalls: {p1: 0, p2: 0}, // update
+            playerName: currentGameState.playerName,
+            winner: currentGameState.winner,
+            history: JSON.parse(JSON.stringify(currentGameState.history))
+        }
+    };
 
     switch (futureGameState['action']) {
         case 'PAWN_MOVED':
+            if (currentGameState.walls) {
+                if (currentGameState.walls.H)
+                    futureGameState.gameState.walls.H = currentGameState.walls.H;
+                if (currentGameState.walls.V)
+                    futureGameState.gameState.walls.V = currentGameState.walls.V;
+            }
+            futureGameState.gameState.availableWalls = currentGameState.availableWalls;
+
             let valid = computePotentialPawn(currentGameState).filter((d) => {
                 return d.X === futureGameState['location'].X && d.Y === futureGameState['location'].Y
             });
-            if (valid.length === 1)
+            if (valid.length === 1) {
+
+                futureGameState.gameState.pawns[futureGameState.gameState.playerTurn] = currentGameState.pawns[futureGameState.gameState.playerTurn];
+                futureGameState.gameState.pawns[currentGameState.playerTurn] = futureMove.location;
+                futureGameState.gameState.history.push(`Pawn ${futureMove.player} is moved to location ${futureGameState['location'].X},${futureGameState['location'].Y}`);
+
                 return Promise.resolve(futureGameState);
+            }
             return Promise.reject("Invalid Move");
             break;
         case 'WALL_ADDED':
+            futureGameState.gameState.pawns = currentGameState.pawns;
+
             let result = verifySelectedWall(currentGameState, futureGameState);
-            if (result['result'])
+            if (result['result']) {
+
+                if (currentGameState.walls) {
+                    if (currentGameState.walls.H)
+                        futureGameState.gameState.walls.H = JSON.parse(JSON.stringify(currentGameState.walls.H));
+                    if (currentGameState.walls.V)
+                        futureGameState.gameState.walls.V = JSON.parse(JSON.stringify(currentGameState.walls.V));
+                }
+
+                futureGameState.gameState.walls[futureMove.location[1]].push(futureMove.location[0]);
+                if (futureMove.location[1] === 'V')
+                    futureGameState.gameState.walls[futureMove.location[1]].push({X: futureMove.location[0].X, Y: futureMove.location[0].Y + ((futureMove.location[0].Y === 8) ? -1 : 1)});
+                else
+                    futureGameState.gameState.walls[futureMove.location[1]].push({X: futureMove.location[0].X + ((futureMove.location[0].X === 8) ? -1 : 1), Y: futureMove.location[0].Y});
+
+                futureGameState.gameState.availableWalls[futureGameState.gameState.playerTurn] = currentGameState.availableWalls[futureGameState.gameState.playerTurn];
+                futureGameState.gameState.availableWalls[currentGameState.playerTurn] = currentGameState.availableWalls[currentGameState.playerTurn] - 1;
+                futureGameState.gameState.history.push(`${futureMove.location[1]} Wall is added by ${futureMove.player} in ${futureGameState['location'][0].X},${futureGameState['location'][0].Y}`);
+
                 return Promise.resolve(futureGameState);
+            }
             return Promise.reject("Invalid Wall");
             break;
         default:
@@ -743,6 +796,45 @@ const checkPathExistence = (gameState, player, walls) => {
     let foundRoute = route.path(`${gameState.pawns[player].X},${gameState.pawns[player].Y}`, 'dummy');
     return foundRoute === null;
 
+};
+
+const validData = (currentGameState, futureMove) => {
+
+    // check for missing data and data types
+
+    if (!futureMove) return false;
+    if (typeof futureMove !== "object") return false;
+    if (Object.keys(futureMove).length !== 3) return false;
+
+    if (!futureMove.player) return false;
+    if (typeof futureMove.player !== "string") return false;
+    if (futureMove.player !== currentGameState.playerTurn) return false;
+
+    if (!futureMove.action) return false;
+    if (typeof futureMove.action !== "string") return false;
+
+    if (!futureMove.location) return false;
+    if (typeof futureMove.location !== "object") return false;
+
+
+    switch (futureMove['action']) {
+        case 'PAWN_MOVED':
+            if (Object.keys(futureMove.location).length !== 2) return false;
+            if (!futureMove.location.X || !futureMove.location.Y) return false;
+            if (typeof futureMove.location.X !== "number" || typeof futureMove.location.Y !== "number") return false;
+
+            break;
+        case 'WALL_ADDED':
+            if (Object.keys(futureMove.location).length !== 2) return false;
+            if (Object.keys(futureMove.location[0]).length !== 2) return false;
+            if (!futureMove.location[0].X || !futureMove.location[0].Y) return false;
+            if (typeof futureMove.location[0].X !== "number" || typeof futureMove.location[0].Y !== "number") return false;
+            if (typeof futureMove.location[1] !== "string") return false;
+
+            break;
+        default:
+            return false;
+    }
 };
 //------------------
 

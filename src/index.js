@@ -219,9 +219,6 @@ class index {
         this.api
             .leaveGame(this.user.gameId, this.user.token)
             .catch(err => console.log(err));
-        this.show(lableName);
-        this.show(mainPage);
-        this.hide(gameDIV);
     }
 
     playMove(gameState) {
