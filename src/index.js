@@ -284,4 +284,4 @@ document
     .addEventListener("click", () => app.leaveGame());
 document
     .getElementById("gameStats")
-    .addEventListener("click", () => app.displaytable());
+    .addEventListener("click", () => app.getLeaderBoard());

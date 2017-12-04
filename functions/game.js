@@ -41,9 +41,6 @@ const setMove = (player, gameId, futureMove) =>
             .then(currentGameState => isValidMove(currentGameState, futureMove))
             .then(futureGameState => isWinnerMove(futureGameState, gameId, player))
             .then(futureGameState => updateGameState(futureGameState, gameId))
-            .then(futureGameState => futureGameState.gameState.winner !== 0
-                ? res(updateGameMessage(`The winner is ${futureGameState.gameState.winner}`, gameId))
-                : res())
             .then(() => switchPlayer(gameId, player).then(() => gameEnded(gameId)))
             .then(() => res(gameId))
             .catch(err => {
@@ -338,6 +335,10 @@ const isWinnerMove = (futureGameState, gameId, player) => {
             ? player.email
             : 0;
     futureGameState.gameState.winner = winner;
+
+    if(winner !== 0)
+        updateGameMessage(`The winner is ${futureGameState.gameState.winner}`, gameId);
+
     return new Promise((res, rej) =>
         admin
             .database()
