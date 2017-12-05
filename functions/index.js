@@ -44,7 +44,7 @@ app.put("/setMove", (req, res) => {
   isAuthenticated(params.token)
     .then(player => checkTurn(params.gameId, player))
     .then(player => setMove(player, params.gameId, params.move))
-    .then(() => res.json(params.gameId))
+    .then(() => res.json(payload))
     .catch(err => res.send({ err }));
 });
 app.put("/timeout", (req, res) => {
@@ -52,7 +52,7 @@ app.put("/timeout", (req, res) => {
   isAuthenticated(params.token)
     .then(player => isPlayingGame(params.gameId, player))
     .then(player => timeout(player, params.gameId))
-    .then(() => res.send())
+    .then(time => res.json(time))
     .catch(err => res.send({ err }));
 });
 

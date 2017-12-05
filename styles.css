@@ -155,81 +155,79 @@ tr {
     border-color: "rgba(220, 68, 68, 0.81)";
     border: 1px solid;
 }
-#backButton {
-    margin-left: 20%;
-    width: 150px
-}
 
 #backButton {
     margin-left: 20%;
     width: 150px
 }
 
-#leaderboard > div {
+#backButton {
+    margin-left: 20%;
+    width: 150px
+}
+
+#leaderboard>div {
     color: rgba(220, 68, 68, 0.81)
 }
 
-#form2 > p {
+#form2>p {
     font-size: 30px;
     margin-left: 20%;
     color: rgba(220, 68, 68, 0.81);
 }
 
-#form2 > span {
-    font-size: 30px;
-    color: rgba(220, 68, 68, 0.81);
-    display: block;
-    margin-left: 20%;
-}
-
-#form2 > span {
+#form2>span {
     font-size: 30px;
     color: rgba(220, 68, 68, 0.81);
     display: block;
     margin-left: 20%;
 }
 
-#form2 > span {
+#form2>span {
     font-size: 30px;
     color: rgba(220, 68, 68, 0.81);
     display: block;
     margin-left: 20%;
 }
 
-#form2 > span {
+#form2>span {
     font-size: 30px;
     color: rgba(220, 68, 68, 0.81);
     display: block;
     margin-left: 20%;
 }
 
-#form2 > div {
+#form2>span {
+    font-size: 30px;
+    color: rgba(220, 68, 68, 0.81);
+    display: block;
+    margin-left: 20%;
+}
+
+#form2>div {
     color: rgba(220, 68, 68, 0.81)
 }
 
-#mainPage > span {
+#mainPage>span {
     font-size: 30px;
     color: rgba(220, 68, 68, 0.81);
     margin-left: 35%;
 }
 
-#mainPage > div {
+#mainPage>div {
     color: rgba(220, 68, 68, 0.81)
 }
 
-#homePage {
-}
+#homePage {}
 
-#authButton {
-}
+#authButton {}
 
 #leaderboard {
     display: none;
     color: rgba(220, 68, 68, 0.81)
 }
 
-#leadertable {
-}
+#leadertable {}
 
 #backButton {
     margin-left: 20%;
@@ -244,11 +242,9 @@ tr {
     margin-left: 20%;
 }
 
-#email {
-}
+#email {}
 
-#pass {
-}
+#pass {}
 
 #signUp {
     margin-left: 20%;
@@ -284,77 +280,73 @@ tr {
     display: none
 }
 
-
 #backButton {
     margin-left: 20%;
     width: 150px
 }
 
-#leaderboard > div {
+#leaderboard>div {
     color: rgba(220, 68, 68, 0.81)
 }
 
-#form2 > p {
+#form2>p {
     font-size: 30px;
     margin-left: 20%;
     color: rgba(220, 68, 68, 0.81);
 }
 
-#form2 > span {
-    font-size: 30px;
-    color: rgba(220, 68, 68, 0.81);
-    display: block;
-    margin-left: 20%;
-}
-
-#form2 > span {
+#form2>span {
     font-size: 30px;
     color: rgba(220, 68, 68, 0.81);
     display: block;
     margin-left: 20%;
 }
 
-#form2 > span {
+#form2>span {
     font-size: 30px;
     color: rgba(220, 68, 68, 0.81);
     display: block;
     margin-left: 20%;
 }
 
-#form2 > span {
+#form2>span {
     font-size: 30px;
     color: rgba(220, 68, 68, 0.81);
     display: block;
     margin-left: 20%;
 }
 
-#form2 > div {
+#form2>span {
+    font-size: 30px;
+    color: rgba(220, 68, 68, 0.81);
+    display: block;
+    margin-left: 20%;
+}
+
+#form2>div {
     color: rgba(220, 68, 68, 0.81)
 }
 
-#mainPage > span {
+#mainPage>span {
     font-size: 30px;
     color: rgba(220, 68, 68, 0.81);
     margin-left: 35%;
 }
 
-#mainPage > div {
+#mainPage>div {
     color: rgba(220, 68, 68, 0.81)
 }
 
-#homePage {
-}
+#homePage {}
 
-#authButton {
-}
+#authButton {}
 
 #leaderboard {
     display: none;
     color: rgba(220, 68, 68, 0.81)
 }
 
-#leadertable {
-}
+#leadertable {}
 
 #backButton {
     margin-left: 20%;
@@ -394,80 +386,111 @@ tr {
     margin-top: 1%;
 }
 
+#loader {
+    display: none;
+    margin-left: 45%;
+}
 
+.loader {
+    border: 16px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 16px solid rgba(220, 68, 68, 0.81);
+    width: 80px;
+    height: 80px;
+    -webkit-animation: spin 2s linear infinite;
+    /* Safari */
+    animation: spin 2s linear infinite;
+}
+
+
+/* Safari */
+
+@-webkit-keyframes spin {
+    0% {
+        -webkit-transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
 
 #gameDIV {
-    display: none
+    display: none;
+    text-align: center
 }
 
-
-#leaderboard > div {
+#leaderboard>div {
     color: rgba(220, 68, 68, 0.81)
 }
 
-#form2 > p {
+#form2>p {
     font-size: 30px;
     margin-left: 20%;
     color: rgba(220, 68, 68, 0.81);
 }
 
-#form2 > span {
-    font-size: 30px;
-    color: rgba(220, 68, 68, 0.81);
-    display: block;
-    margin-left: 20%;
-}
-
-#form2 > span {
+#form2>span {
     font-size: 30px;
     color: rgba(220, 68, 68, 0.81);
     display: block;
     margin-left: 20%;
 }
 
-#form2 > span {
+#form2>span {
     font-size: 30px;
     color: rgba(220, 68, 68, 0.81);
     display: block;
     margin-left: 20%;
 }
 
-#form2 > span {
+#form2>span {
     font-size: 30px;
     color: rgba(220, 68, 68, 0.81);
     display: block;
     margin-left: 20%;
 }
 
-#form2 > div {
+#form2>span {
+    font-size: 30px;
+    color: rgba(220, 68, 68, 0.81);
+    display: block;
+    margin-left: 20%;
+}
+
+#form2>div {
     color: rgba(220, 68, 68, 0.81)
 }
 
-#mainPage > span {
+#mainPage>span {
     font-size: 30px;
     color: rgba(220, 68, 68, 0.81);
     margin-left: 35%;
 }
 
-#mainPage > div {
+#mainPage>div {
     color: rgba(220, 68, 68, 0.81)
 }
-
 
 #leaderboard {
     display: none;
     color: rgba(220, 68, 68, 0.81)
 }
 
-#leadertable {
-}
+#leadertable {}
 
 #backButton {
     margin-left: 20%;
     width: 150px
 }
-
-
 
 #form2 {
     margin-left: 20%;
@@ -505,6 +528,7 @@ tr {
 #gameDIV {
     display: none
 }
+
 #gameSVG {
     width: 600px;
     height: 600px;
@@ -545,15 +569,16 @@ tr {
     fill: transparent;
 }
 
-.wall, .miniSquare {
+.wall,
+.miniSquare {
     fill: #5d5d5d;
 }
-
 
 .route {
     fill: #8b6158;
     opacity: 0.2;
 }
-.container{
+
+.container {
     margin-left: 30%;
 }

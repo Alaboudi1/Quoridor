@@ -13,6 +13,7 @@
         <button type="button" id="authButton" class="myButt two">Login/SignUp</button>
         <button type="button" class="myButt two">About game</button>
     </div>
+
     <div id="leaderboard">
         <p class="gametitle">Quoridor</p>
         <table id="leadertable">
@@ -68,6 +69,10 @@
         </form>
     </div>
     <label id="errMessage" class="error"></label>
+    <div id="loader">
+        <div class="loader"></div>
+        <h2>Loading...</h2>
+    </div>
     <div id="mainPage">
         <label id="lableName"></label>
 
@@ -97,12 +102,15 @@
 
     <!-- TODO -->
     <div id="gameDIV">
+        <div id="timer"></div>
         <div>
-            <div style="text-align: center">
-                <h1><span id="label_p1_name">Player 1</span> walls:
+            <div>
+                <h1>
+                    <span id="label_p1_name">Player 1</span> walls:
                     <span class="label label-default" id="label_p1_Wall">0</span>
                 </h1>
-                <h1><span id="label_p2_name">Player 2</span> walls:
+                <h1>
+                    <span id="label_p2_name">Player 2</span> walls:
                     <span class="label label-default" id="label_p2_Wall">0</span>
                 </h1>
             </div>
@@ -110,6 +118,7 @@
         </div>
         <button type="button" class="myButt two" id="leave">Leave</button>
     </div>
+
     <script src="dist/bundle.js"></script>
 </body>
 

@@ -7,7 +7,7 @@ export class api {
   constructor() {
     firebase.initializeApp(config);
     this.database = firebase.database();
-
+  
     this.URL = "http://localhost:5001/quoridor-swe681/us-central1/api"; // "https://us-central1-quoridor-swe681.cloudfunctions.net/api"
   }
   createNewWaitingGame(gameName, token) {
@@ -117,7 +117,7 @@ export class api {
     )
       .then(payload => payload.json())
       .then(payload => (payload.err ? Promise.reject(payload.err) : payload))
-      .then(gameId => res(gameId))
+      .then(payload => res(payload))
       .catch(err => rej(err))
   );
   }
