@@ -51,6 +51,7 @@ class index {
         this.hide(login);
         this.show(homePage);
         this.hide(leaderboard);
+        errMessage.textContent = "";
         this.api.cancelGamesSubscription(this.user.gameId);
         break;
       case "signUp":
