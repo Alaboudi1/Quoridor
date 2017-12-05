@@ -103,7 +103,7 @@ const timeout = (player, gameId) =>
       .then(nextPlayer =>
         getTimeStamp(gameId).then(timeStamp => {
           // console.log("nextPlayer: ", nextPlayer);
-          Date.now() - timeStamp > 61000
+          Date.now() - timeStamp > 60000
             ? rej(
                 switchPlayer(gameId, nextPlayer).then(() =>
                   changePlayerTurn(gameId)

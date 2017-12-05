@@ -8,7 +8,7 @@ export class api {
     firebase.initializeApp(config);
     this.database = firebase.database();
   
-    this.URL = "https://us-central1-quoridor-swe681.cloudfunctions.net/api"; //"http://localhost:5001/quoridor-swe681/us-central1/api"; 
+    this.URL =  "http://localhost:5001/quoridor-swe681/us-central1/api"; //"https://us-central1-quoridor-swe681.cloudfunctions.net/api";
   }
   createNewWaitingGame(gameName, token) {
     return new Promise((res, rej) =>

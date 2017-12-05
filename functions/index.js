@@ -19,7 +19,7 @@ const {
   getGameHistory
 } = require("./game");
 const corsOptions = {
-  origin: "https://quoridor-swe681.firebaseapp.com",
+  origin: "http://localhost:8080",//"https://quoridor-swe681.firebaseapp.com",
   optionsSuccessStatus: 200
 };
 const helmet = require("helmet");
