@@ -15,10 +15,11 @@ const {
   getLeaderBoard,
   leaveGame,
   getPlayerProfile,
-  timeout
+  timeout,
+  getGameHistory
 } = require("./game");
 const corsOptions = {
-  origin: "http://localhost:8080", //"https://quoridor-swe681.firebaseapp.com",
+  origin: "https://quoridor-swe681.firebaseapp.com",
   optionsSuccessStatus: 200
 };
 const helmet = require("helmet");
@@ -75,7 +76,7 @@ app.put("/leaveGame", (req, res) => {
   const params = JSON.parse(req.body);
   isAuthenticated(params.token)
     .then(player => isPlayingGame(params.gameId, player))
-    .then((player) => leaveGame(params.gameId, player.uid))
+    .then(player => leaveGame(params.gameId, player.uid))
     .then(gameId => res.json(gameId))
     .catch(err => res.send({ err }));
 });
@@ -93,6 +94,14 @@ app.get("/getPlayerProfile", (req, res) => {
   isAuthenticated(token)
     .then(player => getPlayerProfile(player.uid))
     .then(playerProfile => res.send(playerProfile))
+    .catch(err => res.send({ err }));
+});
+
+app.get("/gamesHistory", (req, res) => {
+  const token = req.query.token;
+  isAuthenticated(token)
+    .then(() => getGameHistory())
+    .then(gamesHistory => res.send(gamesHistory))
     .catch(err => res.send({ err }));
 });
 app.all("**", (req, res) => {

@@ -8,7 +8,7 @@ export class api {
     firebase.initializeApp(config);
     this.database = firebase.database();
   
-    this.URL = "http://localhost:5001/quoridor-swe681/us-central1/api"; // "https://us-central1-quoridor-swe681.cloudfunctions.net/api"
+    this.URL = "https://us-central1-quoridor-swe681.cloudfunctions.net/api"; //"http://localhost:5001/quoridor-swe681/us-central1/api"; 
   }
   createNewWaitingGame(gameName, token) {
     return new Promise((res, rej) =>
@@ -134,6 +134,22 @@ export class api {
         .then(payload => payload.json())
         .then(payload => (payload.err ? Promise.reject() : payload))
         .then(players => res(players))
+        .catch(err => rej(err))
+    );
+  }
+  gameHistory(token) {
+    return new Promise((res, rej) =>
+      fetch(
+        `${this.URL}/gamesHistory?token=${
+          token
+        }`,
+        {
+          method: "GET"
+        }
+      )
+        .then(payload => payload.json())
+        .then(payload => (payload.err ? Promise.reject() : payload))
+        .then(games => res(games))
         .catch(err => rej(err))
     );
   }

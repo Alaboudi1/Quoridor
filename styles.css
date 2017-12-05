@@ -479,7 +479,10 @@ tr {
 #mainPage>div {
     color: rgba(220, 68, 68, 0.81)
 }
-
+#renderGamesHistory{
+    display: none;
+    font-size: 30px;
+}
 #leaderboard {
     display: none;
     color: rgba(220, 68, 68, 0.81)

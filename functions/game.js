@@ -602,6 +602,16 @@ const updatePlayerProfile = (playerId, player) =>
       .catch(err => rej(err))
   );
 
+const getGameHistory = () =>
+  new Promise((res, rej) =>
+    admin
+      .database()
+      .ref(`/games`)
+      .once("value")
+      .then(data => Object.keys(data.val()).map(key => data.val()[key].public))
+      .then(games => res(games))
+      .catch(err => rej(err))
+  );
 //------------------  game logic
 
 /**
@@ -917,5 +927,6 @@ module.exports = {
   getLeaderBoard,
   leaveGame,
   getPlayerProfile,
-  timeout
+  timeout,
+  getGameHistory
 };

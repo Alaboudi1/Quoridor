@@ -6,7 +6,7 @@ import { serverCommunication } from "./serverCommunication";
 import { drawBoard } from "./drawBoard";
 import { gameLogic } from "./gameLogic";
 import { drawGameInfo } from "./drawGameInfo";
-
+import JSONFormatter from "json-formatter-js";
 class index {
   constructor() {
     this.subscribe();
@@ -195,7 +195,7 @@ class index {
       if (data["gameStatus"].winner !== 0) {
         errMessage.textContent = `The winner is ${data["gameStatus"].winner}`;
         this.api.cancelGamesSubscription(this.user.gameId);
-        clearInterval(this.tInterval);        
+        clearInterval(this.tInterval);
         this.show(lableName);
         this.show(mainPage);
         this.hide(gameDIV);
@@ -223,10 +223,10 @@ class index {
   timer() {
     clearInterval(this.tInterval);
     this.tInterval = setInterval(() => {
-        this.api
-          .timeout(this.user.token, this.user.gameId)
-          .then(time => (timer.textContent = time))
-          .catch(err => timer.textContent = "Time Up!");
+      this.api
+        .timeout(this.user.token, this.user.gameId)
+        .then(time => (timer.textContent = time))
+        .catch(err => (timer.textContent = "Time Up!"));
     }, 1000);
   }
 
@@ -247,6 +247,26 @@ class index {
     this.api
       .getLeaderBoard(this.user.token)
       .then(players => this.displayTable(players));
+  }
+  gameHistory() {
+    this.show(loader);
+    renderGamesHistory.innerHTML = `<span><button type="button" id="backButton2" class="myButt two">Back</button></span>`;
+    this.api
+      .gameHistory(this.user.token)
+      .then(games =>
+        document
+          .getElementById("renderGamesHistory")
+          .appendChild(new JSONFormatter(games).render())
+      )
+      .then(() => {
+        this.hide(mainPage);
+        this.show(renderGamesHistory);
+        this.hide(loader);
+        document.getElementById("backButton2").addEventListener("click", () => {
+          this.hide(renderGamesHistory);
+          this.show(mainPage);
+        });
+      });
   }
   displayTable(players) {
     var html = "<table border='1|1'>";
@@ -299,3 +319,6 @@ document
 document
   .getElementById("gameStats")
   .addEventListener("click", () => app.getLeaderBoard());
+document
+  .getElementById("gamesHistory")
+  .addEventListener("click", () => app.gameHistory());
