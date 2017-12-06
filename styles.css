@@ -156,16 +156,6 @@ tr {
     border: 1px solid;
 }
 
-#backButton {
-    margin-left: 20%;
-    width: 150px
-}
-
-#backButton {
-    margin-left: 20%;
-    width: 150px
-}
-
 #leaderboard>div {
     color: rgba(220, 68, 68, 0.81)
 }
@@ -229,10 +219,6 @@ tr {
 
 #leadertable {}
 
-#backButton {
-    margin-left: 20%;
-    width: 150px
-}
 
 #authForm {
     display: none;
@@ -272,17 +258,12 @@ tr {
     color: rgba(220, 68, 68, 0.81);
     display: block;
     color: rgb(218, 21, 21);
-    margin-left: 35%;
+    margin-left: 40%;
     margin-top: 1%;
 }
 
 #gameDIV {
     display: none
-}
-
-#backButton {
-    margin-left: 20%;
-    width: 150px
 }
 
 #leaderboard>div {
@@ -348,11 +329,6 @@ tr {
 
 #leadertable {}
 
-#backButton {
-    margin-left: 20%;
-    width: 150px
-}
-
 #form2 {
     margin-left: 20%;
 }
@@ -382,7 +358,7 @@ tr {
     color: rgba(220, 68, 68, 0.81);
     display: block;
     color: rgb(218, 21, 21);
-    margin-left: 35%;
+    margin-left: 40%;
     margin-top: 1%;
 }
 
@@ -488,12 +464,20 @@ tr {
     color: rgba(220, 68, 68, 0.81)
 }
 
-#leadertable {}
+#leadertable {
+	margin-left: 40%;
+}
 
 #backButton {
-    margin-left: 20%;
+    margin-left: 45%;
     width: 150px
 }
+
+#backButton2{
+    margin-left: 45%;
+    width: 150px
+}
+
 
 #form2 {
     margin-left: 20%;
@@ -524,7 +508,7 @@ tr {
     color: rgba(220, 68, 68, 0.81);
     display: block;
     color: rgb(218, 21, 21);
-    margin-left: 35%;
+    margin-left: 40%;
     margin-top: 1%;
 }
 

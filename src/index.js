@@ -250,13 +250,14 @@ class index {
   }
   gameHistory() {
     this.show(loader);
-    renderGamesHistory.innerHTML = `<span><button type="button" id="backButton2" class="myButt two">Back</button></span>`;
+    renderGamesHistory.innerHTML = `<p class="gametitle">Quoridor</p> <span><button type="button" id="backButton2" class="myButt two">Back</button></span>`;
     this.api
       .gameHistory(this.user.token)
       .then(games =>
         document
           .getElementById("renderGamesHistory")
           .appendChild(new JSONFormatter(games).render())
+		  
       )
       .then(() => {
         this.hide(mainPage);
